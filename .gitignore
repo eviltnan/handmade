@@ -1,4 +1,3 @@
-bin
 .idea
 .directory
 *.pyc
@@ -11,3 +10,7 @@ google-play-services_lib/gen/*
 google-play-services_lib/build.xml
 google-play-services_lib/local.properties
 google-play-services_lib/proguard-project.txt
+_build
+build/
+dist/
+*.egg-info
