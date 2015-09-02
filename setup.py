@@ -18,6 +18,10 @@ To find out what's new in this version of Handmade, please see `the changelog
 
 %s
 """ % (version, open('README.rst').read())
+from pip.req import parse_requirements
+
+install_reqs = parse_requirements("requirements.txt")
+reqs = [str(ir.req) for ir in install_reqs]
 
 setup(
     name='handmade',
@@ -33,10 +37,10 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'handmake = handmade.cli:main',
+            'handmade = handmade.cli:main',
         ]
     },
-
+    install_requires=reqs,
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
