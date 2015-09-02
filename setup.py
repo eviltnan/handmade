@@ -33,7 +33,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'handmake = handmade.bin:handmake',
+            'handmake = handmade.cli:main',
         ]
     },
 
