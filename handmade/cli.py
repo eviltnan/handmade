@@ -1,2 +1,8 @@
+import os
+import sys
+from invoke import cli
+
+
 def main():
-    print "cli main executed"
+    path = os.path.dirname(__file__)
+    cli.dispatch(sys.argv + ['-r', path])
