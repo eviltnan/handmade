@@ -1,2 +1,3 @@
 pytest==2.7.2
 pytest-mock
+invoke==0.10.1
