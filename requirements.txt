@@ -1,3 +1,5 @@
 pytest==2.7.2
 pytest-mock
 invoke==0.10.1
+Cython==0.21.2
+kivy==1.9.0
