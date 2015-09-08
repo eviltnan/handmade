@@ -1,4 +1,4 @@
 DEBUG = False
 PLUGINS = [
-    'core',
+    'project',
 ]
