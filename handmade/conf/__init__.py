@@ -97,7 +97,12 @@ class Settings(BaseSettings):
 
         # store the settings module in case someone later cares
         self.SETTINGS_MODULE = settings_module
-        mod = importlib.import_module(self.SETTINGS_MODULE)
+        try:
+            mod = importlib.import_module(self.SETTINGS_MODULE)
+        except ImportError:
+            raise ImproperlyConfigured(
+                "Setting module %s is not found, are you in handmade project?" % self.SETTINGS_MODULE
+            )
         self._explicit_settings = set()
         for setting in dir(mod):
             if setting.isupper():
@@ -105,7 +110,7 @@ class Settings(BaseSettings):
 
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
-        # todo: here is settings validation with ImproperlyConfigured if not valid
+                # todo: here is settings validation with ImproperlyConfigured if not valid
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings
