@@ -3,12 +3,12 @@ from dispatcher import events
 
 
 @task
-def reinstall_handmade(c):
+def handmade_reinstall(c):
     # todo: fix this hardcode
     c.run('cd ../handmade; python setup.py install')
 
 
-@task
+@task(pre=[handmade_reinstall])
 def run(c):
     events.dispatch('on_initialization')
     from application import HandmadeApplication
@@ -17,7 +17,7 @@ def run(c):
 
 
 # todo: reinstall should be something like setting
-@task(pre=[reinstall_handmade])
+@task(pre=[handmade_reinstall])
 def shell(c):
     events.dispatch('on_initialization')
     from IPython import start_ipython
