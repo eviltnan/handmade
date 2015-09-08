@@ -24,7 +24,7 @@ class LazySettings(LazyObject):
     """
     A lazy proxy for either global Django settings or a custom settings object.
     The user can manually configure settings prior to using them. Otherwise,
-    Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.
+    Handmade uses the settings module pointed to by HANDMADE_SETTINGS_MODULE.
     """
 
     def _setup(self, name=None):
@@ -41,7 +41,6 @@ class LazySettings(LazyObject):
                 "You must either define the environment variable %s "
                 "or call settings.configure() before accessing settings."
                 % (desc, ENVIRONMENT_VARIABLE))
-
         self._wrapped = Settings(settings_module)
 
     def __repr__(self):
@@ -98,9 +97,14 @@ class Settings(BaseSettings):
 
         # store the settings module in case someone later cares
         self.SETTINGS_MODULE = settings_module
-
         mod = importlib.import_module(self.SETTINGS_MODULE)
+        self._explicit_settings = set()
+        for setting in dir(mod):
+            if setting.isupper():
+                setting_value = getattr(mod, setting)
 
+                setattr(self, setting, setting_value)
+                self._explicit_settings.add(setting)
         # todo: here is settings validation with ImproperlyConfigured if not valid
 
     def is_overridden(self, setting):
