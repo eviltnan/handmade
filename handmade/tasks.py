@@ -1,7 +1,7 @@
 from invoke import ctask as task
 from invoke import Collection
-from plugins.project import tasks as project_tasks
-from plugins.core import tasks as core_tasks
+from handmade.project import tasks as project_tasks
+from handmade.core import tasks as core_tasks
 
 
 @task(default=True)
