@@ -2,7 +2,7 @@ import os
 
 os.environ.setdefault("HANDMADE_SETTINGS_MODULE", "settings")
 # hack for kivy not being run
-os.environ["KIVY_DOC_INCLUDE"] = '1'
+os.environ["KIVY_NO_ARGS"] = '1'
 
 import sys
 
