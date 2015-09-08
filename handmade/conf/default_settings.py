@@ -1,1 +1,4 @@
 DEBUG = False
+PLUGINS = [
+    'project',
+]
