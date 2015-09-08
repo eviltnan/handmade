@@ -3,9 +3,7 @@ from kivy.event import EventDispatcher
 
 class CoreEventsDispatcher(EventDispatcher):
     def on_initialization(self):
-        # this should be in conf
-        import os
-        os.environ.setdefault("HANDMADE_SETTINGS_MODULE", "settings")
+        pass
 
     def __init__(self):
         super(CoreEventsDispatcher, self).__init__()
