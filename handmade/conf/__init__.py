@@ -100,8 +100,9 @@ class Settings(BaseSettings):
         try:
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError:
+            import os
             raise ImproperlyConfigured(
-                "Setting module %s is not found, are you in handmade project?" % self.SETTINGS_MODULE
+                "Setting module %s is not found, are you in handmade project (%s)?" % (self.SETTINGS_MODULE, os.getcwd())
             )
         self._explicit_settings = set()
         for setting in dir(mod):
