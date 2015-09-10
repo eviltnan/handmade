@@ -1,17 +1,18 @@
 import re
 
 
-class JsonStorage(object):
-    def __init__(self, filename):
-        self.filename = filename
+class BaseModelStorage(object):
+    def create(self, instance):
+        raise NotImplementedError("Create storage entry for model is not implemented in base storage")
 
-    def read(self):
-        with open(self.filename, 'r') as f:
-            return f.read()
+    def delete(self, instance):
+        raise NotImplementedError("Delete storage entry for model is not implemented in base storage")
 
-    def write(self, data):
-        with open(self.filename, 'r') as f:
-            return f.write(self.filename)
+    def update(self, instance):
+        raise NotImplementedError("Update storage entry for model is not implemented in base storage")
+
+    def get(self, id, model_class):
+        raise NotImplementedError("Get storage entry by id for model class is not implemented in base storage")
 
 
 def convert(name):
@@ -19,7 +20,27 @@ def convert(name):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
-class ModelStorage(JsonStorage):
-    def __init__(self, model_klass):
-        filename = "%s.json" % convert(model_klass.__name__)
-        super(ModelStorage, self).__init__(filename)
+class JsonModelStorage(BaseModelStorage):
+    def create(self, instance):
+        if instance.id is not None:
+            raise NotImplementedError()
+
+        new_key = int(max(self._json_storage.keys() or [0])) + 1
+        instance.id = int(new_key)
+
+        data = {}
+        for property in instance.properties():
+            if property != 'id':
+                data[property] = getattr(instance, property)
+
+        self._json_storage.put(new_key, **data)
+
+    def _get_filename(self):
+        return "%s.json" % convert(self.model_class.__name__)
+
+    def __init__(self, model_class):
+        self.model_class = model_class
+        self.filename = self._get_filename()
+        from kivy.storage.jsonstore import JsonStore
+        self._json_storage = JsonStore("models/%s" % self.filename)
+        super(JsonModelStorage, self).__init__()
