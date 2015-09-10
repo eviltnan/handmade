@@ -36,11 +36,11 @@ class JsonModelStorage(BaseModelStorage):
         self._json_storage.put(new_key, **data)
 
     def _get_filename(self):
-        return "%s.json" % convert(self.model_class.__name__)
+        return "models/%s.json" % convert(self.model_class.__name__)
 
     def __init__(self, model_class):
         self.model_class = model_class
         self.filename = self._get_filename()
         from kivy.storage.jsonstore import JsonStore
-        self._json_storage = JsonStore("models/%s" % self.filename)
+        self._json_storage = JsonStore(self.filename)
         super(JsonModelStorage, self).__init__()
