@@ -24,7 +24,15 @@ def convert(name):
 
 class JsonModelStorage(BaseModelStorage):
     def get(self, id_):
-        data = self._json_storage[id_]
+        try:
+            data = self._json_storage[id_]
+        except KeyError:
+            raise self.model_class.DoesNotExist(
+                "%s with id %s is not found in the storage" % (
+                    self.model_class.__name__,
+                    id_
+                )
+            )
         return self.model_class(id=id_, **data)
 
     def save(self, instance):

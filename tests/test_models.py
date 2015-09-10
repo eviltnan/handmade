@@ -21,6 +21,11 @@ def json_storage(request):
     return storage
 
 
+def test_does_not_exist_exception():
+    from handmade.models import BaseModel
+    assert BaseModel.DoesNotExist != TestModel.DoesNotExist
+
+
 def test_json_storage_filename(json_storage):
     assert json_storage.filename == 'models/test_model.json'
 
@@ -49,10 +54,11 @@ def test_json_storage_get_by_id_ok(json_storage):
     instance = TestModel(foo=123)
     json_storage.save(instance)
     got_instance = json_storage.get(instance.id)
-    assert instance.id == got_instance.id, 'Instance got from the json storage has other id as saved one'
+    assert instance.id == got_instance.id, 'Instance gotten from the json storage has other id as saved one'
     assert instance.foo == got_instance.foo, \
-        'Instance got from the json storage has wrong value for field as the saved one'
+        'Instance gotten from the json storage has wrong value for field as the saved one'
 
 
 def test_json_storage_get_by_id_not_found(json_storage):
-    raise NotImplementedError()
+    with pytest.raises(TestModel.DoesNotExist):
+        json_storage.get(10)
