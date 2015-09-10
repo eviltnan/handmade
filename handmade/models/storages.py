@@ -1,4 +1,6 @@
+import os
 import re
+from handmade.conf import settings
 
 
 class BaseModelStorage(object):
@@ -36,7 +38,14 @@ class JsonModelStorage(BaseModelStorage):
         self._json_storage.put(new_key, **data)
 
     def _get_filename(self):
-        return "models/%s.json" % convert(self.model_class.__name__)
+        path = os.path.join(settings.STORAGE_ROOT, "models")
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return "%s/models/%s.json" % (
+            settings.STORAGE_ROOT,
+            convert(self.model_class.__name__)
+        )
 
     def __init__(self, model_class):
         self.model_class = model_class
