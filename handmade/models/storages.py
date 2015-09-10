@@ -4,14 +4,11 @@ from handmade.conf import settings
 
 
 class BaseModelStorage(object):
-    def create(self, instance):
+    def save(self, instance):
         raise NotImplementedError("Create storage entry for model is not implemented in base storage")
 
     def delete(self, instance):
         raise NotImplementedError("Delete storage entry for model is not implemented in base storage")
-
-    def update(self, instance):
-        raise NotImplementedError("Update storage entry for model is not implemented in base storage")
 
     def get(self, id, model_class):
         raise NotImplementedError("Get storage entry by id for model class is not implemented in base storage")
@@ -23,19 +20,19 @@ def convert(name):
 
 
 class JsonModelStorage(BaseModelStorage):
-    def create(self, instance):
-        if instance.id is not None:
-            raise NotImplementedError()
-
-        new_key = int(max(self._json_storage.keys() or [0])) + 1
-        instance.id = int(new_key)
+    def save(self, instance):
+        if instance.id is None:
+            id_ = int(max(self._json_storage.keys() or [0])) + 1
+            instance.id = int(id_)
+        else:
+            id_ = instance.id
 
         data = {}
         for property in instance.properties():
             if property != 'id':
                 data[property] = getattr(instance, property)
 
-        self._json_storage.put(new_key, **data)
+        self._json_storage.put(id_, **data)
 
     def _get_filename(self):
         path = os.path.join(settings.STORAGE_ROOT, "models")
