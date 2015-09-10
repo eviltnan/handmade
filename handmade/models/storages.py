@@ -10,8 +10,11 @@ class BaseModelStorage(object):
     def delete(self, instance):
         raise NotImplementedError("Delete storage entry for model is not implemented in base storage")
 
-    def get(self, id, model_class):
+    def get(self, id_):
         raise NotImplementedError("Get storage entry by id for model class is not implemented in base storage")
+
+    def __init__(self, model_class):
+        self.model_class = model_class
 
 
 def convert(name):
@@ -20,6 +23,10 @@ def convert(name):
 
 
 class JsonModelStorage(BaseModelStorage):
+    def get(self, id_):
+        data = self._json_storage[id_]
+        return self.model_class(id=id_, **data)
+
     def save(self, instance):
         if instance.id is None:
             id_ = int(max(self._json_storage.keys() or [0])) + 1
@@ -45,8 +52,7 @@ class JsonModelStorage(BaseModelStorage):
         )
 
     def __init__(self, model_class):
-        self.model_class = model_class
+        super(JsonModelStorage, self).__init__(model_class)
         self.filename = self._get_filename()
         from kivy.storage.jsonstore import JsonStore
         self._json_storage = JsonStore(self.filename)
-        super(JsonModelStorage, self).__init__()
