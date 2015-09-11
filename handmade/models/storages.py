@@ -24,7 +24,15 @@ def convert(name):
 
 class JsonModelStorage(BaseModelStorage):
     def delete(self, instance):
-        self._json_storage.delete(instance.id)
+        try:
+            self._json_storage.delete(instance.id)
+        except KeyError:
+            raise self.model_class.DoesNotExist(
+                "%s with id %s is not found in the storage" % (
+                    self.model_class.__name__,
+                    instance.id
+                )
+            )
 
     def get(self, id_):
         try:

@@ -74,7 +74,10 @@ def test_json_storage_delete_ok(json_storage):
 
 
 def test_json_storage_delete_not_found_pk(json_storage):
-    raise NotImplementedError()
+    instance = TestModel(foo=123)
+    instance.id = 10
+    with pytest.raises(TestModel.DoesNotExist):
+        json_storage.delete(instance)
 
 
 def test_json_storage_delete_id_none(json_storage):
