@@ -81,4 +81,6 @@ def test_json_storage_delete_not_found_pk(json_storage):
 
 
 def test_json_storage_delete_id_none(json_storage):
-    raise NotImplementedError()
+    instance = TestModel(foo=123)
+    with pytest.raises(RuntimeError):
+        json_storage.delete(instance)

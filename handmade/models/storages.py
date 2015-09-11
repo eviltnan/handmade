@@ -24,6 +24,9 @@ def convert(name):
 
 class JsonModelStorage(BaseModelStorage):
     def delete(self, instance):
+        if not instance.id:
+            raise RuntimeError("Can't delete unsaved instance")
+
         try:
             self._json_storage.delete(instance.id)
         except KeyError:
