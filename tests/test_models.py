@@ -1,12 +1,22 @@
 from kivy.properties import NumericProperty
 import pytest
-from handmade.models import BaseModel
+from handmade.models.base import JsonStoragedModel
 from handmade.models.storages import JsonModelStorage
 import os
 
 
-class TestModel(BaseModel):
+class TestModel(JsonStoragedModel):
     foo = NumericProperty()
+
+
+def test_base_model_meta():
+    from handmade.models.base import BaseModel
+    assert BaseModel.DoesNotExist != TestModel.DoesNotExist
+
+
+def test_storage_creation():
+    instance = TestModel()
+    assert instance.storage
 
 
 @pytest.fixture
@@ -19,11 +29,6 @@ def json_storage(request):
 
     request.addfinalizer(finalizer)
     return storage
-
-
-def test_does_not_exist_exception():
-    from handmade.models import BaseModel
-    assert BaseModel.DoesNotExist != TestModel.DoesNotExist
 
 
 def test_json_storage_filename(json_storage):
