@@ -23,6 +23,9 @@ def convert(name):
 
 
 class JsonModelStorage(BaseModelStorage):
+    def delete(self, instance):
+        self._json_storage.delete(instance.id)
+
     def get(self, id_):
         try:
             data = self._json_storage[id_]
