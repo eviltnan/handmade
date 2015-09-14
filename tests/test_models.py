@@ -178,3 +178,18 @@ def test_multiple_model_widgets_for_one_instance(model_instance):
     assert widget.foo == model_instance.foo
     assert widget2.foo == model_instance.foo
     assert widget3.foo == model_instance.foo
+
+    widget.foo = 11
+    assert model_instance.foo == widget.foo
+    assert widget2.foo == model_instance.foo
+    assert widget3.foo == model_instance.foo
+
+    widget2.foo = 12
+    assert model_instance.foo == widget.foo
+    assert widget.foo == model_instance.foo
+    assert widget3.foo == model_instance.foo
+
+    widget3.foo = 13
+    assert model_instance.foo == widget.foo
+    assert widget.foo == model_instance.foo
+    assert widget2.foo == model_instance.foo
