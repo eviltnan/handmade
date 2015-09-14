@@ -99,10 +99,65 @@ class TestModelWidget(ModelWidget):
     model_class = TestModel
 
 
-def test_model_widget(json_storage):
+@pytest.fixture
+def model_instance(json_storage):
     instance = TestModel()
     instance.save()
-    model_widget = TestModelWidget(instance=instance)
-    assert model_widget.model_instance == instance, 'Unexpected model instance while creation of model widget'
-    model_widget = TestModelWidget(instance_id=instance.id)
-    assert model_widget.model_instance == instance, 'Unexpected model instance while creation of model widget'
+    return instance
+
+
+def test_model_widget_creation(model_instance):
+    model_widget = TestModelWidget(instance=model_instance)
+    assert model_widget.model_instance == model_instance, 'Unexpected model instance while creation of model widget'
+    model_widget = TestModelWidget(instance_id=model_instance.id)
+    assert model_widget.model_instance == model_instance, 'Unexpected model instance while creation of model widget'
+
+
+def test_model_widget_properties_bind(model_instance):
+    model_widget = TestModelWidget(instance=model_instance)
+    assert all(
+        model_instance_property in model_widget.properties()
+        for model_instance_property in model_instance.properties()
+    )
+
+    assert isinstance(model_widget.properties()['foo'], model_instance.properties()['foo'].__class__)
+    assert model_widget.properties()['foo'] is model_instance.properties()['foo']
+
+    model_instance.handler_called = False
+
+    def model_prop_handler(caller, value):
+        assert isinstance(caller, TestModel)
+        caller.handler_called = True
+
+    model_widget.handler_called = False
+
+    def widget_prop_handler(caller, value):
+        assert isinstance(caller, TestModelWidget)
+        model_widget.handler_called = True
+
+    model_instance.bind(foo=model_prop_handler)
+    model_widget.bind(foo=widget_prop_handler)
+    model_instance.foo = 2
+    assert model_widget.foo == model_instance.foo
+    assert model_instance.handler_called, 'Model property handler was not called'
+    assert model_widget.handler_called, 'Widget property handler was not called'
+
+    model_widget.foo = 3
+    assert model_instance.foo == model_widget.foo
+
+
+class TestNamingClashModelWidget(ModelWidget):
+    foo = NumericProperty()
+
+
+def test_model_widget_naming_collision(model_instance):
+    with pytest.raises(AssertionError):
+        TestNamingClashModelWidget(instance=model_instance)
+
+
+def test_model_widget_from_storage():
+    raise NotImplementedError()
+
+
+def tets_multiple_model_widgets_for_one_instance():
+    raise NotImplementedError()
