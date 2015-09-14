@@ -34,6 +34,11 @@ class ModelWidget(Widget):
         self.model_instance.bind(**model_bindings)
         self.bind(**widget_bindings)
 
+    def assign_model_properties(self):
+        for model_property_name in self.model_instance.properties():
+            if model_property_name != 'id':
+                setattr(self, model_property_name, getattr(self.model_instance, model_property_name))
+
     def __init__(self, instance=None, instance_id=None, **kwargs):
         assert instance_id or instance, "Model widget should get either instance id to get pick it from storage" \
                                         "or the model instance"
@@ -45,5 +50,7 @@ class ModelWidget(Widget):
             self.model_instance = instance
 
         self.bind_model_properties()
-
+        self.assign_model_properties()
         super(ModelWidget, self).__init__(**kwargs)
+
+        # todo: rename id? the same prop for widget, not good

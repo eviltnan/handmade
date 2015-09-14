@@ -155,9 +155,12 @@ def test_model_widget_naming_collision(model_instance):
         TestNamingClashModelWidget(instance=model_instance)
 
 
-def test_model_widget_from_storage():
-    raise NotImplementedError()
+def test_model_widget_from_storage(json_storage):
+    instance = TestModel(foo=5)
+    instance.save()
+    widget = TestModelWidget(instance_id=instance.id)
+    assert widget.foo == instance.foo
 
 
-def tets_multiple_model_widgets_for_one_instance():
+def test_multiple_model_widgets_for_one_instance():
     raise NotImplementedError()
