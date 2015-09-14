@@ -57,9 +57,9 @@ class JsonModelStorage(BaseModelStorage):
             id_ = instance.id
 
         data = {}
-        for property in instance.properties():
-            if property != 'id':
-                data[property] = getattr(instance, property)
+        for property_ in instance.properties():
+            if property_ != 'id':
+                data[property_] = getattr(instance, property_)
 
         self._json_storage.put(id_, **data)
 

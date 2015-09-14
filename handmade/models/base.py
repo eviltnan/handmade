@@ -31,6 +31,9 @@ class BaseModel(EventDispatcher):
     def delete(self):
         self.storage.delete(self)
 
+    def __eq__(self, other):
+        return self.id == other.id and self.id is not None
+
 
 class JsonStoragedModel(BaseModel):
     storage_class = JsonModelStorage
