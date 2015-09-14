@@ -4,8 +4,8 @@ from kivy.uix.widget import Widget
 class ModelWidget(Widget):
     model_class = None
 
-    def copy_properties(self):
-        raise NotImplementedError()
+    def map_properties(self):
+        self.apply_property(**self.model_instance.properties())
 
     def __init__(self, instance=None, instance_id=None, **kwargs):
         assert instance_id or instance, "Model widget should get either instance id to get pick it from storage" \
@@ -17,3 +17,5 @@ class ModelWidget(Widget):
             self.model_instance = self.model_class.storage.get(id_=instance_id)
         else:
             self.model_instance = instance
+
+        self.map_properties()
