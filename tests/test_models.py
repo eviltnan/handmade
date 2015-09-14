@@ -3,6 +3,7 @@ import pytest
 from handmade.models.base import JsonStoragedModel
 from handmade.models.storages import JsonModelStorage
 import os
+from handmade.models.widget import ModelWidget
 
 
 class TestModel(JsonStoragedModel):
@@ -94,5 +95,14 @@ def test_json_storage_delete_id_none(json_storage):
         json_storage.delete(instance)
 
 
-def test_properties_copy():
-    raise NotImplementedError()
+class TestModelWidget(ModelWidget):
+    model_class = TestModel
+
+
+def test_model_widget(json_storage):
+    instance = TestModel()
+    instance.save()
+    model_widget = TestModelWidget(instance=instance)
+    assert model_widget.model_instance == instance, 'Unexpected model instance while creation of model widget'
+    model_widget = TestModelWidget(instance_id=instance.id)
+    assert model_widget.model_instance == instance, 'Unexpected model instance while creation of model widget'
