@@ -17,6 +17,9 @@ def test_base_model_meta():
 def test_storage_creation():
     instance = TestModel()
     assert instance.storage
+    instance2 = TestModel()
+
+    assert instance.storage is instance2.storage is TestModel.storage
 
 
 @pytest.fixture
@@ -89,3 +92,7 @@ def test_json_storage_delete_id_none(json_storage):
     instance = TestModel(foo=123)
     with pytest.raises(RuntimeError):
         json_storage.delete(instance)
+
+
+def test_properties_copy():
+    raise NotImplementedError()
