@@ -146,13 +146,17 @@ def test_model_widget_properties_bind(model_instance):
     assert model_instance.foo == model_widget.foo
 
 
-class TestNamingClashModelWidget(ModelWidget):
-    foo = NumericProperty()
-
-
 def test_model_widget_naming_collision(model_instance):
     with pytest.raises(AssertionError):
-        TestNamingClashModelWidget(instance=model_instance)
+        class TestNamingClashModelWidget(ModelWidget):
+            foo = NumericProperty()
+            model_class = TestModel
+
+
+def test_model_widget_class_doesnt_define_model_class():
+    with pytest.raises(RuntimeError):
+        class TestNoModelClassModelWidget(ModelWidget):
+            foo = NumericProperty()
 
 
 def test_model_widget_from_storage(json_storage):
@@ -162,5 +166,15 @@ def test_model_widget_from_storage(json_storage):
     assert widget.foo == instance.foo
 
 
-def test_multiple_model_widgets_for_one_instance():
-    raise NotImplementedError()
+class TestModelWidget2(ModelWidget):
+    model_class = TestModel
+
+
+def test_multiple_model_widgets_for_one_instance(model_instance):
+    widget = TestModelWidget(model_instance)
+    widget2 = TestModelWidget2(model_instance)
+    widget3 = TestModelWidget(model_instance)
+    model_instance.foo = 10
+    assert widget.foo == model_instance.foo
+    assert widget2.foo == model_instance.foo
+    assert widget3.foo == model_instance.foo

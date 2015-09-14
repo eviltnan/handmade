@@ -1,37 +1,54 @@
-from kivy.properties import partial
+from kivy.properties import partial, Property
 
-from kivy.uix.widget import Widget
+from kivy.uix.widget import Widget, WidgetMetaclass
+
+
+def propagate_to_model(widget, property_name, model_instance, value):
+    setattr(widget, property_name, value)
+
+
+def propagate_to_widget(property_name, widget, value):
+    setattr(widget.model_instance, property_name, value)
+
+
+class ModelWidgetMeta(WidgetMetaclass):
+    def __new__(cls, klass, parents, *args, **kwargs):
+        super_new = super(ModelWidgetMeta, cls).__new__(cls, klass, parents, *args, **kwargs)
+        if super_new.model_class:
+            properties = {}
+            for field in super_new.model_class.__dict__.keys():
+                field_value = getattr(super_new.model_class, field)
+                if isinstance(field_value, Property):
+                    properties[field] = field_value
+            for model_property_name, model_property in properties.items():
+                if model_property_name != 'id':
+                    assert not hasattr(super_new, model_property_name), \
+                        'Model widget %s has attribute named the same as model attribute: %s, value: %s.' \
+                        'Model properties will be mapped to widget properties automatically' % (
+                            super_new.__class__.__name__,
+                            model_property_name,
+                            getattr(super_new, model_property_name)
+                        )
+                    setattr(super_new, model_property_name, model_property)
+        else:
+            if Widget not in parents:
+                raise RuntimeError("Model widget class %s doesn't define a model class" % super_new.__name__)
+        return super_new
 
 
 class ModelWidget(Widget):
     model_class = None
+    __metaclass__ = ModelWidgetMeta
 
-    def propagate_to_model(self, property_name, model_instance, value):
-        setattr(self, property_name, value)
-
-    def propagate_to_widget(self, property_name, widget, value):
-        setattr(self.model_instance, property_name, value)
-
-    def bind_model_properties(self):
-        for model_property_name, model_property in self.model_instance.properties().items():
-            if model_property_name != 'id':
-                assert not hasattr(self, model_property_name), \
-                    'Model widget %s has attribute named the same as model attribute: %s, value: %s.' \
-                    'Model properties will be mapped to widget properties automatically' % (
-                        self.__class__.__name__,
-                        model_property_name,
-                        getattr(self, model_property_name)
-                    )
-
-        self.apply_property(**self.model_instance.properties())
-
-        model_bindings = {model_property_name: partial(self.propagate_to_model, model_property_name) for
-                          model_property_name in self.model_instance.properties()}
-
-        widget_bindings = {model_property_name: partial(self.propagate_to_widget, model_property_name) for
-                           model_property_name in self.model_instance.properties()}
-
+    def bind_properties(self):
+        properties = self.model_instance.properties()
+        self.apply_property(**properties)
+        model_bindings = {model_property_name: partial(propagate_to_model, self, model_property_name) for
+                          model_property_name in properties}
         self.model_instance.bind(**model_bindings)
+
+        widget_bindings = {model_property_name: partial(propagate_to_widget, model_property_name) for
+                           model_property_name in properties}
         self.bind(**widget_bindings)
 
     def assign_model_properties(self):
@@ -49,7 +66,7 @@ class ModelWidget(Widget):
         else:
             self.model_instance = instance
 
-        self.bind_model_properties()
+        self.bind_properties()
         self.assign_model_properties()
         super(ModelWidget, self).__init__(**kwargs)
 
