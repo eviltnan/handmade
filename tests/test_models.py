@@ -35,8 +35,8 @@ def json_storage(request):
     return storage
 
 
-def test_json_storage_filename(json_storage):
-    assert json_storage.filename == 'models/test_model.json'
+def test_json_storage_filename(json_storage, settings):
+    assert json_storage.filename == os.path.join(settings.STORAGE_ROOT, 'models', 'test_model.json')
 
 
 def test_json_storage_create(json_storage):
