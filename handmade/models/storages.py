@@ -1,5 +1,6 @@
 import os
 import re
+from handmade.exceptions import ProgrammingError
 from handmade.conf import settings
 
 
@@ -60,8 +61,11 @@ class JsonModelStorage(BaseModelStorage):
         for property_ in instance.properties():
             if property_ != 'id':
                 data[property_] = getattr(instance, property_)
-
-        self._json_storage.put(id_, **data)
+        try:
+            self._json_storage.put(id_, **data)
+        except TypeError as ex:
+            raise ProgrammingError("Object of model %s can't be serialized, "
+                                   "be careful while using object properties: %s" % (self.__class__.__name__, ex))
 
     def _get_filename(self):
         path = os.path.join(settings.STORAGE_ROOT, "models")

@@ -1,9 +1,11 @@
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, ObjectProperty
 import pytest
-from handmade.models.base import JsonStoragedModel
+from handmade.exceptions import ProgrammingError
+from handmade.models.base import JsonStoragedModel, BaseModel
 from handmade.models.storages import JsonModelStorage
 import os
 from handmade.models.widget import ModelWidget
+from datetime import datetime
 
 
 class TestModel(JsonStoragedModel):
@@ -56,7 +58,12 @@ def test_json_storage_update(json_storage):
 
 
 def test_json_storage_create_json_unserializable(json_storage):
-    raise NotImplementedError()
+    class UnserializableFieldModel(JsonStoragedModel):
+        object_field = ObjectProperty()
+
+    model = UnserializableFieldModel(object_field=datetime.now())
+    with pytest.raises(ProgrammingError):
+        json_storage.save(model)
 
 
 def test_json_storage_get_by_id_ok(json_storage):
