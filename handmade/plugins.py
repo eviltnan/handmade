@@ -1,6 +1,16 @@
 from handmade.exceptions import ImproperlyConfigured
 
 
+def configure():
+    from conf import settings
+    import importlib
+    for plugin in settings.PLUGINS:
+        try:
+            importlib.import_module("handmade.%s.configure" % plugin)
+        except ImportError:
+            pass
+
+
 def tasks_collections():
     from conf import settings
     import importlib
