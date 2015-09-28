@@ -41,6 +41,7 @@ setup(
         ]
     },
     install_requires=reqs,
+    include_package_data=True,
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',

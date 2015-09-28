@@ -8,7 +8,7 @@ def handmade_reinstall(c):
     c.run('cd ../handmade; python setup.py install')
 
 
-@task(pre=[handmade_reinstall])
+@task
 def run(c):
     events.dispatch('on_initialization')
     from application import HandmadeApplication
@@ -16,8 +16,7 @@ def run(c):
     app.run()
 
 
-# todo: reinstall should be something like setting
-@task(pre=[handmade_reinstall])
+@task
 def shell(c):
     events.dispatch('on_initialization')
     from IPython import start_ipython

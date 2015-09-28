@@ -1,0 +1,2 @@
+class BaseTheme(object):
+    pass
