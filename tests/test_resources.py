@@ -100,8 +100,11 @@ def test_get_attribute_not_in_module_context(resource_manager):
         resource_manager.dummy
 
 
-def test_get_attribute_not_found():
-    raise NotImplementedError()
+def test_get_attribute_not_found(resource_manager):
+    with for_plugin('dummy'):
+        resource_manager.dummy = 'dummy'
+        with pytest.raises(ResourceManager.IdNotRegistered):
+            resource_manager.dummy2
 
 
 def test_get_attribute_with_module():
