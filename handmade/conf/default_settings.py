@@ -1,5 +1,6 @@
 DEBUG = False
 PLUGINS = [
+    'core',
     'project',
     'resources',
     'themes'
