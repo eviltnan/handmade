@@ -1,6 +1,7 @@
 from collections import defaultdict
 from contextlib import contextmanager
 from handmade.exceptions import ProgrammingError
+from kivy import Logger
 
 
 class BaseResource(object):
@@ -39,6 +40,7 @@ class ItemNotationWrapper(object):
 class ResourceManager(object):
     RESOURCE_TYPE_MAPPING = {
     }
+    managers = {}
     current_plugin = None
 
     class ModuleNotRegistered(ProgrammingError):
@@ -53,7 +55,8 @@ class ResourceManager(object):
     @classmethod
     def register_type(cls, type_key, klass):
         cls.RESOURCE_TYPE_MAPPING[type_key] = klass
-        return cls(type_key)
+        cls.managers[type_key] = cls(type_key)
+        return cls.managers[type_key]
 
     def __init__(self, resource_type):
 
@@ -86,11 +89,13 @@ class ResourceManager(object):
         return self.registry[module][resource_id].get(*args, **kwargs)
 
     @classmethod
-    def start_register_for_plugin(cls, plugin_name):
-        cls.current_plugin = plugin_name
+    def enter_plugin_context(cls, plugin):
+        Logger.debug("Resources: enter in plugin context of %s" % plugin)
+        cls.current_plugin = plugin
 
     @classmethod
-    def finish_register_for_plugin(cls):
+    def exit_plugin_context(cls):
+        Logger.debug("Resources: exit plugin context")
         cls.current_plugin = None
 
     def __setattr__(self, key, value):
@@ -124,12 +129,11 @@ class ResourceManager(object):
 
 @contextmanager
 def for_plugin(plugin_name):
-    ResourceManager.start_register_for_plugin(plugin_name)
+    ResourceManager.enter_plugin_context(plugin_name)
     try:
         yield
     finally:
-        ResourceManager.finish_register_for_plugin()
-
+        ResourceManager.exit_plugin_context()
 
 image = ResourceManager.register_type('image', ImageResource)
 

@@ -1,6 +1,8 @@
 DEBUG = False
 PLUGINS = [
+    'core',
     'project',
+    'resources',
     'themes'
 ]
 ROOT_WIDGET = 'kivy.uix.screenmanager.ScreenManager'
