@@ -28,11 +28,13 @@ def resource_manager():
 
 
 def test_register_module_not_found(resource_manager):
-    resource_manager.register(resource_id=id, module='module', dummy_parameter='test.png')
+    resource_manager.register(resource_id='id', module='module', dummy_parameter='test.png')
 
 
-def test_register_resource_id_already_registered():
-    raise NotImplementedError()
+def test_register_resource_id_already_registered(resource_manager):
+    resource_manager.register(resource_id='id', module='module', dummy_parameter='test.png')
+    with pytest.raises(ProgrammingError):
+        resource_manager.register(resource_id='id', module='module', dummy_parameter='test.png')
 
 
 def test_get_module_not_found():
