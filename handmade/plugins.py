@@ -1,42 +1,50 @@
-from handmade.exceptions import ImproperlyConfigured
+import importlib
+
+from handmade.exceptions import ImproperlyConfigured, ProgrammingError
+from kivy import Logger
 
 
-def configure():
-    from conf import settings
-    import importlib
-    for plugin in settings.PLUGINS:
+class Plugin(object):
+    plugins = {}
+
+    @classmethod
+    def register(cls, name, klass=None):
+        klass = klass or cls
+        Logger.debug("Plugins: register plugin %s, class %s" % (name, klass))
+        instance = klass(name)
+        cls.plugins[name] = instance
+        return instance
+
+    def configure(self):
+        pass
+
+    def discover_tasks(self):
         try:
-            importlib.import_module("handmade.%s.configure" % plugin)
-        except ImportError:
-            pass
-
-
-def tasks_collections():
-    from conf import settings
-    import importlib
-    for plugin in settings.PLUGINS:
-        try:
-            importlib.import_module(plugin)
-        except ImportError:
-            try:
-                importlib.import_module("handmade." + plugin)
-            except ImportError:
-                raise ImproperlyConfigured("Plugin %s is not found" % plugin)
-        try:
-            tasks = importlib.import_module("handmade.%s.tasks" % plugin)
+            tasks = importlib.import_module("%s.tasks" % self.name)
         except ImportError:
             pass
         else:
-            yield plugin, tasks
+            self.tasks = tasks
+
+    def register_resources(self):
+        raise NotImplementedError()
+
+    def __init__(self, name):
+        self.name = name
+        self.tasks = None
+
+        self.discover_tasks()
+        self.configure()
 
 
-def resources():
+def discover():
     from conf import settings
-    from resources import for_plugin
-    import importlib
+
     for plugin in settings.PLUGINS:
+        Logger.debug("Plugins: discover plugin %s" % plugin)
         try:
-            with for_plugin(plugin):
-                importlib.import_module("handmade.%s.resources" % plugin)
+            plugin_module = importlib.import_module(plugin)
         except ImportError:
-            pass
+            raise ImproperlyConfigured("Plugin %s is not found" % plugin)
+        if not hasattr(plugin_module, 'plugin'):
+            raise ProgrammingError("Plugin %s does not register itself with Plugin.register" % plugin)
