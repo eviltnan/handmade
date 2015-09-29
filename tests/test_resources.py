@@ -37,9 +37,14 @@ def test_register_resource_id_already_registered(resource_manager):
         resource_manager.register(resource_id='id', module='module', dummy_parameter='test.png')
 
 
-def test_get_module_not_found():
-    raise NotImplementedError()
+def test_get_module_not_found(resource_manager):
+    with pytest.raises(ResourceManager.ModuleNotRegistered):
+        resource_manager.get('module', 'id')
 
 
 def test_get_resource_id_not_found():
+    raise NotImplementedError()
+
+
+def test_get_after_register():
     raise NotImplementedError()
