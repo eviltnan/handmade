@@ -49,7 +49,7 @@ class ResourceManager(object):
 
         if resource_type not in ResourceManager.RESOURCE_TYPE_MAPPING:
             raise ProgrammingError("Unknown resource type %s" % resource_type)
-        with register_for_plugin('handmade.resources'):
+        with for_plugin('handmade.resources'):
             self.resource_type = resource_type
             self.registry = defaultdict(dict)
 
@@ -109,7 +109,7 @@ class ResourceManager(object):
 
 
 @contextmanager
-def register_for_plugin(plugin_name):
+def for_plugin(plugin_name):
     ResourceManager.start_register_for_plugin(plugin_name)
     try:
         yield

@@ -1,6 +1,6 @@
 import pytest
 from handmade.exceptions import ProgrammingError
-from handmade.resources import ResourceManager, BaseResource, register_for_plugin
+from handmade.resources import ResourceManager, BaseResource, for_plugin
 
 
 def test_unknown_resource_type():
@@ -65,7 +65,7 @@ def test_activate_registering_for_plugin():
     assert ResourceManager.current_plugin is None, \
         'ResourceManager has %s plugin activated before entering the context' \
         ' of registering resources' % ResourceManager.current_plugin
-    with register_for_plugin('dummy'):
+    with for_plugin('dummy'):
         assert ResourceManager.current_plugin == 'dummy'
     assert ResourceManager.current_plugin is None, \
         'ResourceManager has %s plugin activated after entering the context' \
@@ -78,14 +78,14 @@ def test_attribute_register_not_in_context(resource_manager):
 
 
 def test_attribute_register_default_value(resource_manager):
-    with register_for_plugin('dummy'):
+    with for_plugin('dummy'):
         resource_manager.dummy = 'test.png'
         assert resource_manager.get('dummy', 'dummy') == 'test.png', \
             'Unexpected resource value after registering %s' % resource_manager.get('dummy', 'dummy')
 
 
 def test_attribute_register_dict(resource_manager):
-    with register_for_plugin('dummy'):
+    with for_plugin('dummy'):
         resource_manager.dummy = {
             'dummy_parameter': 'test.png'
         }
@@ -94,7 +94,7 @@ def test_attribute_register_dict(resource_manager):
 
 
 def test_get_attribute_not_in_module_context(resource_manager):
-    with register_for_plugin('dummy'):
+    with for_plugin('dummy'):
         resource_manager.dummy = 'dummy'
     with pytest.raises(ResourceManager.CurrentPluginNotSet):
         resource_manager.dummy
