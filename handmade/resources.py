@@ -13,6 +13,9 @@ class BaseResource(object):
     def process(self, *args, **kwargs):
         raise NotImplementedError()
 
+    def default_value(self, value):
+        raise NotImplementedError()
+
 
 class ImageResource(BaseResource):
     def __init__(self, filename, *args, **kwargs):
@@ -45,7 +48,7 @@ class ResourceManager(object):
 
         if resource_type not in ResourceManager.RESOURCE_TYPE_MAPPING:
             raise ProgrammingError("Unknown resource type %s" % resource_type)
-        with register_for_plugin('resources'):
+        with register_for_plugin('handmade.resources'):
             self.resource_type = resource_type
             self.registry = defaultdict(dict)
 
@@ -80,8 +83,17 @@ class ResourceManager(object):
         cls.current_plugin = None
 
     def __setattr__(self, key, value):
+
+        if ResourceManager.current_plugin == 'handmade.resources':
+            return super(ResourceManager, self).__setattr__(key, value)
+
         if ResourceManager.current_plugin is None:
             raise ResourceManager.CurrentPluginNotSet
+
+        if not isinstance(value, dict):
+            value = ResourceManager.RESOURCE_TYPE_MAPPING[self.resource_type].default_value(value)
+
+        self.register(key, ResourceManager.current_plugin, **value)
 
 
 @contextmanager
