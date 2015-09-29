@@ -1,22 +1,23 @@
 import os
+import sys
 
 os.environ.setdefault("HANDMADE_SETTINGS_MODULE", "settings")
 # hack for kivy not being run
 os.environ["KIVY_NO_ARGS"] = '1'
 from kivy.config import Config
-Config.set('kivy', 'log_level', 'debug')
 
-import sys
+Config.set('kivy', 'log_level', 'debug')
 
 sys.path += [os.getcwd()]
 from invoke import Collection
-from handmade.core import tasks as core_tasks
-from plugins import tasks_collections, configure, resources
+from handmade.conf import settings
+from handmade.plugins import discover, Plugin
 
-configure()
-resources()
+discover()
+ns = Collection.from_module(Plugin.plugins['handmade.core'].tasks, name='core')
 
-ns = Collection.from_module(core_tasks, name='core')
-
-for plugin, module in tasks_collections():
-    ns.add_collection(Collection.from_module(module), name=plugin)
+for plugin_name in settings.PLUGINS:
+    if plugin_name == 'handmande.core':
+        continue
+    plugin = Plugin.plugins[plugin_name]
+    ns.add_collection(Collection.from_module(plugin.tasks), name=plugin_name)
