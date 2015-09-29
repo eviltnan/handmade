@@ -33,6 +33,9 @@ class ResourceManager(object):
     class IdNotRegistered(ProgrammingError):
         pass
 
+    class CurrentPluginNotSet(ProgrammingError):
+        pass
+
     @classmethod
     def register_type(cls, type_key, klass):
         cls.RESOURCE_TYPE_MAPPING[type_key] = klass
@@ -42,9 +45,9 @@ class ResourceManager(object):
 
         if resource_type not in ResourceManager.RESOURCE_TYPE_MAPPING:
             raise ProgrammingError("Unknown resource type %s" % resource_type)
-
-        self.resource_type = resource_type
-        self.registry = defaultdict(dict)
+        with register_for_plugin('resources'):
+            self.resource_type = resource_type
+            self.registry = defaultdict(dict)
 
     def register(self, resource_id, module, *args, **kwargs):
         if resource_id in self.registry[module]:
@@ -76,6 +79,10 @@ class ResourceManager(object):
     def finish_register_for_plugin(cls):
         cls.current_plugin = None
 
+    def __setattr__(self, key, value):
+        if ResourceManager.current_plugin is None:
+            raise ResourceManager.CurrentPluginNotSet
+
 
 @contextmanager
 def register_for_plugin(plugin_name):
@@ -84,6 +91,7 @@ def register_for_plugin(plugin_name):
         yield
     finally:
         ResourceManager.finish_register_for_plugin()
+
 
 image = ResourceManager.register_type('image', ImageResource)
 

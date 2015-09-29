@@ -70,6 +70,11 @@ def test_activate_registering_for_plugin():
         ' of registering resources' % ResourceManager.current_plugin
 
 
+def test_attribute_register_not_in_context(resource_manager):
+    with pytest.raises(ResourceManager.CurrentPluginNotSet):
+        resource_manager.dummy = 'dummy.png'
+
+
 def test_attribute_register():
     raise NotImplementedError()
 
