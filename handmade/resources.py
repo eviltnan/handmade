@@ -1,4 +1,5 @@
 from collections import defaultdict
+from contextlib import contextmanager
 from handmade.exceptions import ProgrammingError
 
 
@@ -24,6 +25,7 @@ class ImageResource(BaseResource):
 class ResourceManager(object):
     RESOURCE_TYPE_MAPPING = {
     }
+    current_plugin = None
 
     class ModuleNotRegistered(ProgrammingError):
         pass
@@ -66,6 +68,22 @@ class ResourceManager(object):
 
         return self.registry[module][resource_id].get(*args, **kwargs)
 
+    @classmethod
+    def start_register_for_plugin(cls, plugin_name):
+        cls.current_plugin = plugin_name
+
+    @classmethod
+    def finish_register_for_plugin(cls):
+        cls.current_plugin = None
+
+
+@contextmanager
+def register_for_plugin(plugin_name):
+    ResourceManager.start_register_for_plugin(plugin_name)
+    try:
+        yield
+    finally:
+        ResourceManager.finish_register_for_plugin()
 
 image = ResourceManager.register_type('image', ImageResource)
 
