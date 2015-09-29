@@ -3,6 +3,8 @@ import os
 os.environ.setdefault("HANDMADE_SETTINGS_MODULE", "settings")
 # hack for kivy not being run
 os.environ["KIVY_NO_ARGS"] = '1'
+from kivy.config import Config
+Config.set('kivy', 'log_level', 'debug')
 
 import sys
 
