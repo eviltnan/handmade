@@ -28,6 +28,9 @@ class ResourceManager(object):
     class ModuleNotRegistered(ProgrammingError):
         pass
 
+    class IdNotRegistered(ProgrammingError):
+        pass
+
     @classmethod
     def register_type(cls, type_key, klass):
         cls.RESOURCE_TYPE_MAPPING[type_key] = klass
@@ -55,10 +58,11 @@ class ResourceManager(object):
             raise ResourceManager.ModuleNotRegistered("Module %s is not found in resource registry" % module)
 
         if resource_id not in self.registry[module]:
-            raise ProgrammingError("Resource %(resource_id) is not found in %(module)s resource registry" % {
-                "resource_id": resource_id,
-                "module": module
-            })
+            raise ResourceManager.IdNotRegistered(
+                "Resource %(resource_id)s is not found in %(module)s resource registry" % {
+                    "resource_id": resource_id,
+                    "module": module
+                })
 
         return self.registry[module][resource_id].get(*args, **kwargs)
 
