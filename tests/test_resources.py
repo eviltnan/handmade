@@ -107,9 +107,12 @@ def test_get_attribute_not_found(resource_manager):
             resource_manager.dummy2
 
 
-def test_get_attribute_with_module():
-    raise NotImplementedError()
-
-
 def test_get_attribute_ok():
     raise NotImplementedError()
+
+
+def test_get_attribute_item_notation(resource_manager):
+    with for_plugin('dummy'):
+        resource_manager.dummy = 'dummy'
+    assert resource_manager['dummy'].dummy == 'dummy', \
+        "Unexpected value of attribute style get resource %s" % resource_manager['dummy'].dummy

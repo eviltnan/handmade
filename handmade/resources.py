@@ -26,6 +26,16 @@ class ImageResource(BaseResource):
         return self.filename
 
 
+class ItemNotationWrapper(object):
+    def __init__(self, item, manager):
+        self.item = item
+        self.manager = manager
+
+    def __getattr__(self, item):
+        with for_plugin(item):
+            return getattr(self.manager, item)
+
+
 class ResourceManager(object):
     RESOURCE_TYPE_MAPPING = {
     }
@@ -106,6 +116,10 @@ class ResourceManager(object):
                 "Current plugin is not set. You can't use attribute notation, use syntax manager[module].%s" % item)
 
         return self.get(item, ResourceManager.current_plugin)
+
+    def __getitem__(self, item):
+
+        return ItemNotationWrapper(item, self)
 
 
 @contextmanager
