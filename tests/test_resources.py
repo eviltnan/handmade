@@ -48,5 +48,8 @@ def test_get_resource_id_not_found(resource_manager):
         resource_manager.get('module', 'id2')
 
 
-def test_get_after_register():
-    raise NotImplementedError()
+def test_get_after_register(resource_manager):
+    resource_manager.register(resource_id='id', module='module', dummy_parameter='test.png')
+    resource = resource_manager.get('module', 'id')
+    assert resource == 'test.png', \
+        "Unexpected value of dummy parameter got from registry: %s" % resource.dummy_parameter
