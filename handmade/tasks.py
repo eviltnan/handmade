@@ -17,7 +17,10 @@ discover()
 ns = Collection.from_module(Plugin.plugins['handmade.core'].tasks, name='core')
 
 for plugin_name in settings.PLUGINS:
-    if plugin_name == 'handmande.core':
+    if plugin_name == 'handmade.core':
         continue
     plugin = Plugin.plugins[plugin_name]
-    ns.add_collection(Collection.from_module(plugin.tasks), name=plugin_name)
+    collection_name = plugin_name.replace("handmade.", "")  # built in plugins won't have prefix
+    collection_name = collection_name.replace(".", "_")  # period causes invoke crash
+    if plugin.tasks:
+        ns.add_collection(Collection.from_module(plugin.tasks), name=collection_name)
