@@ -1,7 +1,11 @@
 from collections import defaultdict
 from contextlib import contextmanager
+
+from handmade.plugins import Plugin
 from handmade.exceptions import ProgrammingError
 from kivy import Logger
+
+plugin = Plugin.register('handmade.resources')
 
 
 class BaseResource(object):
@@ -134,6 +138,7 @@ def for_plugin(plugin_name):
         yield
     finally:
         ResourceManager.exit_plugin_context()
+
 
 image = ResourceManager.register_type('image', ImageResource)
 
