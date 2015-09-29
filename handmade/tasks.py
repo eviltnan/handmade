@@ -9,8 +9,10 @@ import sys
 sys.path += [os.getcwd()]
 from invoke import Collection
 from handmade.core import tasks as core_tasks
-from plugins import tasks_collections, configure
+from plugins import tasks_collections, configure, resources
+
 configure()
+resources()
 
 ns = Collection.from_module(core_tasks, name='core')
 
