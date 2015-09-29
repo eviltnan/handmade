@@ -61,7 +61,7 @@ class ResourceManager(object):
             })
         self.registry[module][resource_id] = self.RESOURCE_TYPE_MAPPING[self.resource_type](*args, **kwargs)
 
-    def get(self, module, resource_id, *args, **kwargs):
+    def get(self, resource_id, module, *args, **kwargs):
 
         if module not in self.registry:
             raise ResourceManager.ModuleNotRegistered("Module %s is not found in resource registry" % module)
@@ -89,12 +89,23 @@ class ResourceManager(object):
             return super(ResourceManager, self).__setattr__(key, value)
 
         if ResourceManager.current_plugin is None:
-            raise ResourceManager.CurrentPluginNotSet
+            raise ResourceManager.CurrentPluginNotSet(
+                "Current plugin is not set. You should register resources only in resources module")
 
         if not isinstance(value, dict):
             value = ResourceManager.RESOURCE_TYPE_MAPPING[self.resource_type].default_value(value)
 
         self.register(key, ResourceManager.current_plugin, **value)
+
+    def __getattr__(self, item):
+        if ResourceManager.current_plugin == 'handmade.resources':
+            return super(ResourceManager, self).__getattr__(item)
+
+        if ResourceManager.current_plugin is None:
+            raise ResourceManager.CurrentPluginNotSet(
+                "Current plugin is not set. You can't use attribute notation, use syntax manager[module].%s" % item)
+
+        return self.get(item, ResourceManager.current_plugin)
 
 
 @contextmanager
@@ -108,5 +119,8 @@ def register_for_plugin(plugin_name):
 
 image = ResourceManager.register_type('image', ImageResource)
 
-# image('core:icon') <-- get
-# image.icon = "images/hello.png" <-- registering in icon
+# image.icon <-- in context
+# image['core'].icon <-- not in context
+# image['core'].icon['xxxhdpi']['android'] <-- modifiers, resource level
+# image.icon = "images/hello.png" <-- registering non dict style
+# image.icon = {"filename": "images/hello.png"}

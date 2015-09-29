@@ -45,18 +45,18 @@ def test_register_resource_id_already_registered(resource_manager):
 
 def test_get_module_not_found(resource_manager):
     with pytest.raises(ResourceManager.ModuleNotRegistered):
-        resource_manager.get('module', 'id')
+        resource_manager.get('id', 'module')
 
 
 def test_get_resource_id_not_found(resource_manager):
     resource_manager.register(resource_id='id', module='module', dummy_parameter='test.png')
     with pytest.raises(ResourceManager.IdNotRegistered):
-        resource_manager.get('module', 'id2')
+        resource_manager.get('id2', 'module')
 
 
 def test_get_after_register(resource_manager):
     resource_manager.register(resource_id='id', module='module', dummy_parameter='test.png')
-    resource = resource_manager.get('module', 'id')
+    resource = resource_manager.get('id', 'module')
     assert resource == 'test.png', \
         "Unexpected value of dummy parameter got from registry: %s" % resource.dummy_parameter
 
@@ -91,6 +91,13 @@ def test_attribute_register_dict(resource_manager):
         }
     assert resource_manager.get('dummy', 'dummy') == 'test.png', \
         'Unexpected resource value after registering %s' % resource_manager.get('dummy', 'dummy')
+
+
+def test_get_attribute_not_in_module_context(resource_manager):
+    with register_for_plugin('dummy'):
+        resource_manager.dummy = 'dummy'
+    with pytest.raises(ResourceManager.CurrentPluginNotSet):
+        resource_manager.dummy
 
 
 def test_get_attribute_not_found():
