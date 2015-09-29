@@ -13,7 +13,8 @@ class BaseResource(object):
     def process(self, *args, **kwargs):
         raise NotImplementedError()
 
-    def default_value(self, value):
+    @classmethod
+    def default_value(cls, value):
         raise NotImplementedError()
 
 

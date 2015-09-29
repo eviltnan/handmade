@@ -9,6 +9,12 @@ def test_unknown_resource_type():
 
 
 class DummyResource(BaseResource):
+    @classmethod
+    def default_value(cls, value):
+        return {
+            "dummy_parameter": value
+        }
+
     def get(self, *args, **kwargs):
         return self.dummy_parameter
 
@@ -71,10 +77,11 @@ def test_attribute_register_not_in_context(resource_manager):
         resource_manager.dummy = 'dummy.png'
 
 
-def test_attribute_register_default_value():
-    raise NotImplementedError()
+def test_attribute_register_default_value(resource_manager):
     with register_for_plugin('dummy'):
-        resource_manager.dummy = 'dummy'
+        resource_manager.dummy = 'test.png'
+        assert resource_manager.get('dummy', 'dummy') == 'test.png', \
+            'Unexpected resource value after registering %s' % resource_manager.get('dummy', 'dummy')
 
 
 def test_attribute_register_dict(resource_manager):
@@ -84,3 +91,15 @@ def test_attribute_register_dict(resource_manager):
         }
     assert resource_manager.get('dummy', 'dummy') == 'test.png', \
         'Unexpected resource value after registering %s' % resource_manager.get('dummy', 'dummy')
+
+
+def test_get_attribute_not_found():
+    raise NotImplementedError()
+
+
+def test_get_attribute_with_module():
+    raise NotImplementedError()
+
+
+def test_get_attribute_ok():
+    raise NotImplementedError()
