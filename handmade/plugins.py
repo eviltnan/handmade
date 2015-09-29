@@ -4,18 +4,6 @@ from handmade.exceptions import ImproperlyConfigured, ProgrammingError
 from kivy import Logger
 
 
-def resources():
-    from conf import settings
-    from resources import for_plugin
-    import importlib
-    for plugin in settings.PLUGINS:
-        try:
-            with for_plugin(plugin):
-                importlib.import_module("handmade.%s.resources" % plugin)
-        except ImportError:
-            pass
-
-
 class Plugin(object):
     plugins = {}
 
