@@ -3,7 +3,7 @@ from invoke import ctask as task
 
 @task
 def list(c):
-    from handmade.resources import ResourceManager
+    from handmade.resources.managers import ResourceManager
     from handmade.conf import settings
     for plugin in settings.PLUGINS:
         print "%s:\n" % plugin

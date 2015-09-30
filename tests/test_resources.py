@@ -1,6 +1,6 @@
 import pytest
 from handmade.exceptions import ProgrammingError
-from handmade.resources import ResourceManager, BaseResource, for_plugin
+from handmade.resources.managers import BaseResource, ResourceManager, for_plugin
 
 
 def test_unknown_resource_type():
