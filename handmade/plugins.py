@@ -9,6 +9,10 @@ class Plugin(object):
 
     @classmethod
     def register(cls, name, klass=None):
+
+        if name in cls.plugins and cls.plugins[name] == klass:
+            raise ProgrammingError("Plugin %s is already registered with class %s" % (name, klass))
+
         klass = klass or cls
         Logger.debug("Plugins: register plugin %s, class %s" % (name, klass))
         instance = klass(name)
@@ -27,7 +31,12 @@ class Plugin(object):
             self.tasks = tasks
 
     def register_resources(self):
-        raise NotImplementedError()
+        from resources.managers import for_plugin
+        try:
+            with for_plugin(self.name):
+                importlib.import_module("%s.resources" % self.name)
+        except ImportError:
+            Logger.debug("Plugins: plugin %s does not declare resources, pass" % self.name)
 
     def __init__(self, name):
         self.name = name
@@ -35,6 +44,7 @@ class Plugin(object):
 
         self.discover_tasks()
         self.configure()
+        self.register_resources()
 
 
 def discover():
@@ -44,7 +54,7 @@ def discover():
         Logger.debug("Plugins: discover plugin %s" % plugin)
         try:
             plugin_module = importlib.import_module(plugin)
-        except ImportError:
-            raise ImproperlyConfigured("Plugin %s is not found" % plugin)
+        except ImportError as ex:
+            raise ImproperlyConfigured("Plugin %s is not found, ex: %s" % (plugin, ex))
         if not hasattr(plugin_module, 'plugin'):
             raise ProgrammingError("Plugin %s does not register itself with Plugin.register" % plugin)

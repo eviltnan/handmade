@@ -1,11 +1,14 @@
+# coding=utf-8
 from invoke import ctask as task
 
 
 @task
-def list(c):
-    from handmade.resources import ResourceManager
+def all(c):
+    from handmade.resources.managers import ResourceManager
     from handmade.conf import settings
     for plugin in settings.PLUGINS:
-        print "%s:\n" % plugin
+        print "%s:" % plugin
         for type_key, manager in ResourceManager.managers.items():
-            print "%s: %s" % (type_key, manager.registry[plugin].keys())
+            ids = manager.registry[plugin].keys()
+            if ids:
+                print u"╚%s: %s" % (type_key, ",".join(ids))
