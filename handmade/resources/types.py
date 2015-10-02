@@ -19,13 +19,16 @@ class BaseResource(object):
         self.validate()
 
 
-class ImageResource(BaseResource):
+class FileResource(BaseResource):
     class FileNotFound(Exception):
         pass
 
-    def validate(self, *args, **kwargs):
-        if not os.path.exists(self.filename):
-            raise ImageResource.FileNotFound("Image %s not found" % self.filename)
+    def __init__(self, filename, *args, **kwargs):
+        self.filename = filename
+        super(FileResource, self).__init__()
+
+    def get(self, *args, **kwargs):
+        return self.filename
 
     @classmethod
     def default_value(cls, value):
@@ -33,9 +36,15 @@ class ImageResource(BaseResource):
             "filename": value
         }
 
-    def __init__(self, filename, *args, **kwargs):
-        self.filename = filename
-        super(ImageResource, self).__init__()
+    def process(self, *args, **kwargs):
+        app_path = os.getcwd()
+        full_path = os.path.join(app_path, self.filename)
+        raise NotImplementedError()
 
-    def get(self, *args, **kwargs):
-        return self.filename
+    def validate(self, *args, **kwargs):
+        if not os.path.exists(self.filename):
+            raise FileResource.FileNotFound("Image %s not found" % self.filename)
+
+
+class ImageResource(FileResource):
+    pass
