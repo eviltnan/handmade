@@ -1,6 +1,7 @@
 import pytest
 from handmade.exceptions import ProgrammingError
-from handmade.resources.managers import BaseResource, ResourceManager, for_plugin
+from handmade.resources.managers import ResourceManager, for_plugin
+from handmade.resources.types import BaseResource, ImageResource
 
 
 def test_unknown_resource_type():
@@ -119,3 +120,17 @@ def test_get_attribute_item_notation(resource_manager):
         resource_manager.dummy = 'dummy'
     assert resource_manager['dummy'].dummy == 'dummy', \
         "Unexpected value of attribute style get resource %s" % resource_manager['dummy'].dummy
+
+
+@pytest.fixture
+def image_resource():
+    return ImageResource('tests/test_data/image/test.png')
+
+
+def test_image_resource_get(image_resource):
+    assert image_resource.get() == 'image/test.png'
+
+
+def test_image_validate(image_resource):
+    with pytest.raises(ImageResource.FileNotFound):
+        not_found_resource = ImageResource('tests/not_found.png')
