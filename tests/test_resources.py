@@ -124,8 +124,16 @@ def test_get_attribute_item_notation(resource_manager):
 
 @pytest.fixture
 def image_resource():
-    return ImageResource('image/test.png')
+    return ImageResource('tests/test_data/image/test.png')
 
 
 def test_image_resource_get(image_resource):
     assert image_resource.get() == 'image/test.png'
+
+
+def test_image_validate(image_resource):
+    image_resource.validate()
+
+    not_found_resource = ImageResource('tests/not_found.png')
+    with pytest.raises(ImageResource.FileNotFound):
+        not_found_resource.validate()
