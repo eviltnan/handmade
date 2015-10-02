@@ -15,6 +15,9 @@ class BaseResource(object):
     def default_value(cls, value):
         raise NotImplementedError()
 
+    def __init__(self):
+        self.validate()
+
 
 class ImageResource(BaseResource):
     class FileNotFound(Exception):
@@ -32,6 +35,7 @@ class ImageResource(BaseResource):
 
     def __init__(self, filename, *args, **kwargs):
         self.filename = filename
+        super(ImageResource, self).__init__()
 
     def get(self, *args, **kwargs):
         return self.filename

@@ -132,8 +132,5 @@ def test_image_resource_get(image_resource):
 
 
 def test_image_validate(image_resource):
-    image_resource.validate()
-
-    not_found_resource = ImageResource('tests/not_found.png')
     with pytest.raises(ImageResource.FileNotFound):
-        not_found_resource.validate()
+        not_found_resource = ImageResource('tests/not_found.png')
