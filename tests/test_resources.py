@@ -1,7 +1,8 @@
 import pytest
+
 from handmade.exceptions import ProgrammingError
 from handmade.resources.managers import ResourceManager, for_plugin
-from handmade.resources.types import BaseResource, ImageResource
+from handmade.resources.types import BaseResource, FileResource
 
 
 def test_unknown_resource_type():
@@ -123,14 +124,14 @@ def test_get_attribute_item_notation(resource_manager):
 
 
 @pytest.fixture
-def image_resource():
-    return ImageResource('tests/test_data/image/test.png')
+def file_resource():
+    return FileResource('tests/test_data/image/test.png')
 
 
-def test_image_resource_get(image_resource):
-    assert image_resource.get() == 'image/test.png'
+def test_file_resource_get(file_resource):
+    assert file_resource.get() == file_resource.filename
 
 
-def test_image_validate(image_resource):
-    with pytest.raises(ImageResource.FileNotFound):
-        not_found_resource = ImageResource('tests/not_found.png')
+def test_file_resource_validate():
+    with pytest.raises(FileResource.FileNotFound):
+        FileResource('tests/not_found.png')
