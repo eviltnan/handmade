@@ -139,9 +139,6 @@ def file_resource(request):
     resource = just_file.get('test', 'test_plugin')
 
     def fin():
-        import shutil
-        from handmade.conf import settings
-        shutil.rmtree(settings.RESOURCES_ROOT)
         just_file.unregister('test', 'test_plugin')
 
     request.addfinalizer(fin)

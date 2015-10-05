@@ -1,3 +1,4 @@
+import shutil
 from _pytest.python import fixture
 from handmade.utils import empty
 
@@ -13,6 +14,8 @@ def test_project(request):
     settings.configure()
 
     def fin():
+        shutil.rmtree(settings.RESOURCES_ROOT, ignore_errors=True)
+        shutil.rmtree(settings.STORAGE_ROOT, ignore_errors=True)
         settings._wrapped = empty
         os.chdir(old_cwd)
     request.addfinalizer(fin)
