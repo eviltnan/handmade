@@ -67,7 +67,7 @@ class ResourceManager(object):
                     "module": plugin
                 })
 
-        return self.registry[plugin][resource_id].get(*args, **kwargs)
+        return self.registry[plugin][resource_id]
 
     @classmethod
     def enter_plugin_context(cls, plugin):
