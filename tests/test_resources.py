@@ -59,7 +59,7 @@ def test_get_resource_id_not_found(resource_manager):
 def test_get_after_register(resource_manager):
     resource_manager.register(resource_id='id', plugin='module', dummy_parameter='test.png')
     resource = resource_manager.get('id', 'module')
-    assert resource == 'test.png', \
+    assert resource.dummy_parameter == 'test.png', \
         "Unexpected value of dummy parameter got from registry: %s" % resource.dummy_parameter
 
 
@@ -82,8 +82,16 @@ def test_attribute_register_not_in_context(resource_manager):
 def test_attribute_register_default_value(resource_manager):
     with for_plugin('dummy'):
         resource_manager.dummy = 'test.png'
-        assert resource_manager.get('dummy', 'dummy') == 'test.png', \
+        assert resource_manager.get('dummy', 'dummy').dummy_parameter == 'test.png', \
             'Unexpected resource value after registering %s' % resource_manager.get('dummy', 'dummy')
+
+
+def test_resource_unregister(resource_manager):
+    with for_plugin('dummy'):
+        resource_manager.dummy = 'test.png'
+    resource_manager.unregister('dummy', 'dummy')
+    with pytest.raises(ResourceManager.IdNotRegistered):
+        resource_manager['dummy'].dummy
 
 
 def test_attribute_register_dict(resource_manager):
@@ -91,7 +99,7 @@ def test_attribute_register_dict(resource_manager):
         resource_manager.dummy = {
             'dummy_parameter': 'test.png'
         }
-    assert resource_manager.get('dummy', 'dummy') == 'test.png', \
+    assert resource_manager.get('dummy', 'dummy').dummy_parameter == 'test.png', \
         'Unexpected resource value after registering %s' % resource_manager.get('dummy', 'dummy')
 
 
@@ -134,6 +142,7 @@ def file_resource(request):
         import shutil
         from handmade.conf import settings
         shutil.rmtree(settings.RESOURCES_ROOT)
+        just_file.unregister('test', 'test_plugin')
 
     request.addfinalizer(fin)
     return resource
