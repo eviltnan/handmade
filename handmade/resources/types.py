@@ -37,8 +37,7 @@ class FileResource(BaseResource):
         super(FileResource, self).__init__(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        raise NotImplementedError()
-        return self.filename
+        return self.destination_path
 
     @classmethod
     def default_value(cls, value):

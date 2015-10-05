@@ -156,4 +156,4 @@ def test_file_resource_process(file_resource):
 
 
 def test_file_resource_get(file_resource):
-    assert file_resource.get() == file_resource.filename
+    assert file_resource.get() == file_resource.destination_path
