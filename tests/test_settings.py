@@ -5,7 +5,8 @@ from handmade.conf import settings
 from handmade.utils import empty
 
 
-def test_improperly_configured(settings):
+def test_improperly_configured():
+    from handmade.conf import settings
     settings._wrapped = empty
     with pytest.raises(ImproperlyConfigured):
         print settings

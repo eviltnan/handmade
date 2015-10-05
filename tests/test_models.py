@@ -37,7 +37,8 @@ def json_storage(request):
     return storage
 
 
-def test_json_storage_filename(json_storage, settings):
+def test_json_storage_filename(json_storage):
+    from handmade.conf import settings
     assert json_storage.filename == os.path.join(settings.STORAGE_ROOT, 'models', 'test_model.json')
 
 
