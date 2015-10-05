@@ -55,6 +55,15 @@ class ResourceManager(object):
             plugin=plugin, *args, **kwargs
         )
 
+    def unregister(self, resource_id, plugin):
+        if not resource_id in self.registry[plugin]:
+            raise ProgrammingError("Resource id %(resource_id)s is not "
+                                   "registered for module %(module)s, can't unregister" % {
+                                       "resource_id": resource_id,
+                                       "module": plugin
+                                   })
+        del self.registry[plugin][resource_id]
+
     def get(self, resource_id, plugin, *args, **kwargs):
 
         if plugin not in self.registry:
@@ -102,7 +111,7 @@ class ResourceManager(object):
             raise ResourceManager.CurrentPluginNotSet(
                 "Current plugin is not set. You can't use attribute notation, use syntax manager[module].%s" % item)
 
-        return self.get(item, ResourceManager.current_plugin)
+        return self.get(item, ResourceManager.current_plugin).get()
 
     def __getitem__(self, item):
 
