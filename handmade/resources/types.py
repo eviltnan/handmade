@@ -1,4 +1,7 @@
 import os
+from handmade.conf import settings
+from handmade.exceptions import ProgrammingError
+from handmade.plugins import Plugin
 
 
 class BaseResource(object):
@@ -15,17 +18,26 @@ class BaseResource(object):
     def default_value(cls, value):
         raise NotImplementedError()
 
-    def __init__(self):
+    def __init__(self, plugin=None, *args, **kwargs):
+        if not plugin:
+            raise ProgrammingError("Plugin is not set while creating a resource. "
+                                   "You should register resources with the manager")
+        self.plugin = plugin
         self.validate()
 
 
-class ImageResource(BaseResource):
+class FileResource(BaseResource):
     class FileNotFound(Exception):
         pass
 
-    def validate(self, *args, **kwargs):
-        if not os.path.exists(self.filename):
-            raise ImageResource.FileNotFound("Image %s not found" % self.filename)
+    def __init__(self, filename, *args, **kwargs):
+        self.filename = filename
+        self.source_path = None
+        self.destination_path = None
+        super(FileResource, self).__init__(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        return self.destination_path
 
     @classmethod
     def default_value(cls, value):
@@ -33,9 +45,28 @@ class ImageResource(BaseResource):
             "filename": value
         }
 
-    def __init__(self, filename, *args, **kwargs):
-        self.filename = filename
-        super(ImageResource, self).__init__()
+    def process(self, *args, **kwargs):
 
-    def get(self, *args, **kwargs):
-        return self.filename
+        chunks = [settings.RESOURCES_ROOT]
+        chunks += self.plugin.split(".")
+        chunks.append(self.filename)
+        full_path = os.path.join(*chunks)
+        if not os.path.exists(os.path.dirname(full_path)):
+            os.makedirs(os.path.dirname(full_path))
+        self.destination_path = full_path
+        import shutil
+        shutil.copy(self.source_path, self.destination_path)
+
+    def validate(self, *args, **kwargs):
+        plugin_path = Plugin.get_plugin_path(self.plugin)
+
+        full_path = os.path.join(plugin_path, 'data', self.filename)
+        if not os.path.exists(full_path):
+            raise FileResource.FileNotFound("File %s not found. "
+                                            "File name should relative to plugin's data directory" % self.filename)
+        else:
+            self.source_path = full_path
+
+
+class ImageResource(FileResource):
+    pass

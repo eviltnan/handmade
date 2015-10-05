@@ -8,3 +8,4 @@ PLUGINS = [
 ROOT_WIDGET = 'kivy.uix.screenmanager.ScreenManager'
 STORAGE_ROOT = "storage"
 THEME = 'handmade.themes.default'
+RESOURCES_ROOT = 'data'

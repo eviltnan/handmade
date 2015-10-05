@@ -1,4 +1,5 @@
 import importlib
+import os
 
 from handmade.exceptions import ImproperlyConfigured, ProgrammingError
 from kivy import Logger
@@ -6,6 +7,14 @@ from kivy import Logger
 
 class Plugin(object):
     plugins = {}
+
+    @classmethod
+    def get_plugin_path(cls, plugin_name):
+        try:
+            module = importlib.import_module(plugin_name)
+        except ImportError:
+            raise ProgrammingError('Plugin %s is not found' % plugin_name)
+        return os.path.dirname(module.__file__)
 
     @classmethod
     def register(cls, name, klass=None):
