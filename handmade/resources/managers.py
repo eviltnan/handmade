@@ -2,17 +2,17 @@ from collections import defaultdict
 from contextlib import contextmanager
 
 from handmade.exceptions import ProgrammingError
-from handmade.resources.types import ImageResource
+from handmade.resources.types import ImageResource, FileResource
 from kivy import Logger
 
 
 class ItemNotationWrapper(object):
-    def __init__(self, item, manager):
-        self.item = item
+    def __init__(self, plugin, manager):
+        self.plugin = plugin
         self.manager = manager
 
     def __getattr__(self, item):
-        with for_plugin(item):
+        with for_plugin(self.plugin):
             return getattr(self.manager, item)
 
 
@@ -45,27 +45,29 @@ class ResourceManager(object):
             self.resource_type = resource_type
             self.registry = defaultdict(dict)
 
-    def register(self, resource_id, module, *args, **kwargs):
-        if resource_id in self.registry[module]:
+    def register(self, resource_id, plugin, *args, **kwargs):
+        if resource_id in self.registry[plugin]:
             raise ProgrammingError("Resource id %(resource_id)s is already registered for module %(module)s" % {
                 "resource_id": resource_id,
-                "module": module
+                "module": plugin
             })
-        self.registry[module][resource_id] = self.RESOURCE_TYPE_MAPPING[self.resource_type](*args, **kwargs)
+        self.registry[plugin][resource_id] = self.RESOURCE_TYPE_MAPPING[self.resource_type](
+            plugin=plugin, *args, **kwargs
+        )
 
-    def get(self, resource_id, module, *args, **kwargs):
+    def get(self, resource_id, plugin, *args, **kwargs):
 
-        if module not in self.registry:
-            raise ResourceManager.ModuleNotRegistered("Module %s is not found in resource registry" % module)
+        if plugin not in self.registry:
+            raise ResourceManager.ModuleNotRegistered("Module %s is not found in resource registry" % plugin)
 
-        if resource_id not in self.registry[module]:
+        if resource_id not in self.registry[plugin]:
             raise ResourceManager.IdNotRegistered(
                 "Resource %(resource_id)s is not found in %(module)s resource registry" % {
                     "resource_id": resource_id,
-                    "module": module
+                    "module": plugin
                 })
 
-        return self.registry[module][resource_id].get(*args, **kwargs)
+        return self.registry[plugin][resource_id].get(*args, **kwargs)
 
     @classmethod
     def enter_plugin_context(cls, plugin):
@@ -84,7 +86,8 @@ class ResourceManager(object):
 
         if ResourceManager.current_plugin is None:
             raise ResourceManager.CurrentPluginNotSet(
-                "Current plugin is not set. You should register resources only in resources module")
+                "Current plugin is not set. You should register resources only in resources module "
+                "or with for_plugin decorator")
 
         if not isinstance(value, dict):
             value = ResourceManager.RESOURCE_TYPE_MAPPING[self.resource_type].default_value(value)
@@ -115,4 +118,5 @@ def for_plugin(plugin_name):
         ResourceManager.exit_plugin_context()
 
 
+just_file = ResourceManager.register_type('file', FileResource)
 image = ResourceManager.register_type('image', ImageResource)
