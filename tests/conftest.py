@@ -3,7 +3,10 @@ from handmade.utils import empty
 
 
 @fixture(autouse=True)
-def settings(request):
+def test_project(request):
+    import os
+    os.chdir(os.path.join('tests', 'test_project'))
+
     from handmade.conf import settings
     settings.configure(
         STORAGE_ROOT='tests/test_data/storage'
