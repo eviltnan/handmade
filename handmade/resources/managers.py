@@ -2,7 +2,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 
 from handmade.exceptions import ProgrammingError
-from handmade.resources.types import ImageResource, FileResource
+from handmade.resources.types import ImageResource, FileResource, AtlasResource
 from kivy import Logger
 
 
@@ -47,10 +47,12 @@ class ResourceManager(object):
 
     def register(self, resource_id, plugin, *args, **kwargs):
         if resource_id in self.registry[plugin]:
-            raise ProgrammingError("Resource id %(resource_id)s is already registered for module %(module)s" % {
-                "resource_id": resource_id,
-                "module": plugin
-            })
+            raise ProgrammingError("%(resource_name)s resource id \"%(resource_id)s\" "
+                                   "is already registered for plugin \"%(module)s\"" % {
+                                       "resource_name": self.resource_type.capitalize(),
+                                       "resource_id": resource_id,
+                                       "module": plugin
+                                   })
         self.registry[plugin][resource_id] = self.RESOURCE_TYPE_MAPPING[self.resource_type](
             plugin=plugin, *args, **kwargs
         )
@@ -129,3 +131,4 @@ def for_plugin(plugin_name):
 
 just_file = ResourceManager.register_type('file', FileResource)
 image = ResourceManager.register_type('image', ImageResource)
+atlas = ResourceManager.register_type('atlas', AtlasResource)
