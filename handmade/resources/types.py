@@ -35,6 +35,7 @@ class FileResource(BaseResource):
         self.source_path = None
         self.destination_path = None
         super(FileResource, self).__init__(*args, **kwargs)
+        self.build_destination_path()
 
     def get(self, *args, **kwargs):
         return self.destination_path
@@ -55,7 +56,6 @@ class FileResource(BaseResource):
         self.destination_path = full_path
 
     def process(self, *args, **kwargs):
-        self.build_destination_path()
         import shutil
         shutil.copy(self.source_path, self.destination_path)
 
@@ -75,18 +75,24 @@ class ImageResource(FileResource):
 
 
 class AtlasResource(FileResource):
+    def get(self, *args, **kwargs):
+        from kivy.atlas import Atlas
+        if not self.atlas:
+            self.atlas = Atlas(self.atlas_filename)
+        return self.atlas
+
     DEFAULT_SIZE = (1024, 1024)
 
     def process(self, *args, **kwargs):
-        self.build_destination_path()
 
         from kivy.atlas import Atlas
-        self.atlas_filename, self.atlas_meta = Atlas.create(
+        path, meta = Atlas.create(
             outname=self.destination_path,
             filenames=self.source_files,
             size=self.size,
             **kwargs
         )
+        assert self.atlas_filename == path, "Unexpected atlas path after processing"
 
     class NotADirectory(ResourceError):
         pass
@@ -112,5 +118,5 @@ class AtlasResource(FileResource):
         super(AtlasResource, self).__init__(filename, *args, **kwargs)
         self.size = size or self.DEFAULT_SIZE
 
-        self.atlas_filename = None
-        self.atlas_meta = None
+        self.atlas_filename = self.destination_path + ".atlas"
+        self.atlas = None

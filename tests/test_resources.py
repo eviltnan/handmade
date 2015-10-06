@@ -169,6 +169,7 @@ def atlas_resource(request):
     def fin():
         atlas.unregister('test', 'test_plugin')
 
+    resource.process()
     request.addfinalizer(fin)
     return resource
 
@@ -188,8 +189,6 @@ def test_atlas_resource_directory_empty():
 def test_atlas_process(atlas_resource):
     atlas_resource.process()
     assert atlas_resource.atlas_filename == 'data/test_plugin/test_atlas.atlas'
-    assert 'test' in atlas_resource.atlas_meta['test_atlas-0.png']
-    assert 'test2' in atlas_resource.atlas_meta['test_atlas-0.png']
 
 
 def test_atlas_register_dict_notation():
@@ -202,5 +201,10 @@ def test_atlas_register_dict_notation():
     assert resource.size == (4, 4)
 
 
-def test_atlas_get():
-    raise NotImplementedError()
+def test_atlas_get(atlas_resource):
+    atlas_instance = atlas_resource.get()
+    assert 'test' in atlas_instance.textures.keys()
+    texture = atlas_instance['test']
+
+    from kivy.graphics.texture import TextureRegion
+    assert isinstance(texture, TextureRegion)
