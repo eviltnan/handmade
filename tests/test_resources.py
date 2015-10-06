@@ -192,12 +192,14 @@ def test_atlas_process(atlas_resource):
     assert 'test2' in atlas_resource.atlas_meta['test_atlas-0.png']
 
 
-def test_atlas_register_default_notation():
-    raise NotImplementedError()
-
-
 def test_atlas_register_dict_notation():
-    raise NotImplementedError()
+    with for_plugin('test_plugin'):
+        atlas.test = {
+            'filename': 'test_atlas',
+            'size': (4, 4)
+        }
+    resource = atlas.get('test', 'test_plugin')
+    assert resource.size == (4, 4)
 
 
 def test_atlas_get():
