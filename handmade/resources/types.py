@@ -45,8 +45,7 @@ class FileResource(BaseResource):
             "filename": value
         }
 
-    def process(self, *args, **kwargs):
-
+    def build_destination_path(self):
         chunks = [settings.RESOURCES_ROOT]
         chunks += self.plugin.split(".")
         chunks.append(self.filename)
@@ -54,6 +53,9 @@ class FileResource(BaseResource):
         if not os.path.exists(os.path.dirname(full_path)):
             os.makedirs(os.path.dirname(full_path))
         self.destination_path = full_path
+
+    def process(self, *args, **kwargs):
+        self.build_destination_path()
         import shutil
         shutil.copy(self.source_path, self.destination_path)
 
@@ -73,19 +75,42 @@ class ImageResource(FileResource):
 
 
 class AtlasResource(FileResource):
+    DEFAULT_SIZE = (1024, 1024)
+
+    def process(self, *args, **kwargs):
+        self.build_destination_path()
+
+        from kivy.atlas import Atlas
+        self.atlas_filename, self.atlas_meta = Atlas.create(
+            outname=self.destination_path,
+            filenames=self.source_files,
+            size=self.size,
+            **kwargs
+        )
+
     class NotADirectory(ResourceError):
         pass
 
     class DirectoryEmpty(ResourceError):
         pass
 
-    def __init__(self, filename, *args, **kwargs):
-        super(AtlasResource, self).__init__(filename, *args, **kwargs)
-
+    def validate(self, *args, **kwargs):
+        super(AtlasResource, self).validate(*args, **kwargs)
         if not os.path.isdir(self.source_path):
             raise AtlasResource.NotADirectory("Atlas filename should be a directory, "
                                               "%s is not a directory" % self.source_path)
 
         import glob
-        if not glob.glob1(self.source_path, "*.png"):
+        self.source_files = [os.path.join(self.source_path, filename)
+                             for filename in glob.glob1(self.source_path, "*.png")]
+
+        if not self.source_files:
             raise AtlasResource.DirectoryEmpty("Atlas directory %s does not contain png files" % self.source_path)
+
+    def __init__(self, filename, size=None, *args, **kwargs):
+        self.source_files = None
+        super(AtlasResource, self).__init__(filename, *args, **kwargs)
+        self.size = size or self.DEFAULT_SIZE
+
+        self.atlas_filename = None
+        self.atlas_meta = None

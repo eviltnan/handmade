@@ -164,7 +164,7 @@ def atlas_resource(request):
     with for_plugin('test_plugin'):
         atlas.test = 'test_atlas'
 
-    resource = just_file.get('test', 'test_plugin')
+    resource = atlas.get('test', 'test_plugin')
 
     def fin():
         atlas.unregister('test', 'test_plugin')
@@ -183,3 +183,22 @@ def test_atlas_resource_directory_empty():
     with pytest.raises(AtlasResource.DirectoryEmpty):
         with for_plugin('test_plugin'):
             atlas.test = 'empty_atlas'
+
+
+def test_atlas_process(atlas_resource):
+    atlas_resource.process()
+    assert atlas_resource.atlas_filename == 'data/test_plugin/test_atlas.atlas'
+    assert 'test' in atlas_resource.atlas_meta['test_atlas-0.png']
+    assert 'test2' in atlas_resource.atlas_meta['test_atlas-0.png']
+
+
+def test_atlas_register_default_notation():
+    raise NotImplementedError()
+
+
+def test_atlas_register_dict_notation():
+    raise NotImplementedError()
+
+
+def test_atlas_get():
+    raise NotImplementedError()
