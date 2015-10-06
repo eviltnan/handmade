@@ -1,8 +1,8 @@
 import pytest
 
 from handmade.exceptions import ProgrammingError
-from handmade.resources.managers import ResourceManager, for_plugin, just_file
-from handmade.resources.types import BaseResource, FileResource
+from handmade.resources.managers import ResourceManager, for_plugin, just_file, atlas
+from handmade.resources.types import BaseResource, FileResource, AtlasResource
 
 
 def test_unknown_resource_type():
@@ -157,3 +157,27 @@ def test_file_resource_process(file_resource):
 
 def test_file_resource_get(file_resource):
     assert file_resource.get() == file_resource.destination_path
+
+
+@pytest.fixture
+def atlas_resource(request):
+    with for_plugin('test_plugin'):
+        atlas.test = 'test_atlas'
+
+    resource = just_file.get('test', 'test_plugin')
+
+    def fin():
+        atlas.unregister('test', 'test_plugin')
+
+    request.addfinalizer(fin)
+    return resource
+
+
+def test_atlas_resource_file_is_directory():
+    with pytest.raises(AtlasResource.NotADirectory):
+        with for_plugin('test_plugin'):
+            atlas.test = 'test_atlas_not_directory.txt'
+
+
+def test_atlas_resource_file_not_empty():
+    raise NotImplementedError()
