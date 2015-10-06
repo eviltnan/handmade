@@ -186,18 +186,13 @@ def test_atlas_resource_directory_empty():
             atlas.test = 'empty_atlas'
 
 
-def test_atlas_process(atlas_resource):
-    atlas_resource.process()
-    assert atlas_resource.atlas_filename == 'data/test_plugin/test_atlas.atlas'
-
-
 def test_atlas_register_dict_notation():
     with for_plugin('test_plugin'):
-        atlas.test = {
+        atlas.test2 = {
             'filename': 'test_atlas',
             'size': (4, 4)
         }
-    resource = atlas.get('test', 'test_plugin')
+    resource = atlas.get('test2', 'test_plugin')
     assert resource.size == (4, 4)
 
 
@@ -208,3 +203,7 @@ def test_atlas_get(atlas_resource):
 
     from kivy.graphics.texture import TextureRegion
     assert isinstance(texture, TextureRegion)
+
+
+def test_atlas_process(atlas_resource):
+    assert atlas_resource.atlas_filename == 'data/test_plugin/test_atlas.atlas'
