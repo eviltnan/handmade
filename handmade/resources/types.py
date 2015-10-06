@@ -1,6 +1,6 @@
 import os
 from handmade.conf import settings
-from handmade.exceptions import ProgrammingError
+from handmade.exceptions import ProgrammingError, ResourceError
 from handmade.plugins import Plugin
 
 
@@ -27,7 +27,7 @@ class BaseResource(object):
 
 
 class FileResource(BaseResource):
-    class FileNotFound(Exception):
+    class FileNotFound(ResourceError):
         pass
 
     def __init__(self, filename, *args, **kwargs):
@@ -63,10 +63,22 @@ class FileResource(BaseResource):
         full_path = os.path.join(plugin_path, 'data', self.filename)
         if not os.path.exists(full_path):
             raise FileResource.FileNotFound("File %s not found. "
-                                            "File name should relative to plugin's data directory" % self.filename)
+                                            "File name should be relative to plugin's data directory" % self.filename)
         else:
             self.source_path = full_path
 
 
 class ImageResource(FileResource):
     pass
+
+
+class AtlasResource(FileResource):
+    class NotADirectory(ResourceError):
+        pass
+
+    def __init__(self, filename, *args, **kwargs):
+        super(AtlasResource, self).__init__(filename, *args, **kwargs)
+
+        if not os.path.isdir(self.source_path):
+            raise AtlasResource.NotADirectory("Atlas filename should be a directory, "
+                                              "%s is not a directory" % self.source_path)

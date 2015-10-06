@@ -2,7 +2,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 
 from handmade.exceptions import ProgrammingError
-from handmade.resources.types import ImageResource, FileResource
+from handmade.resources.types import ImageResource, FileResource, AtlasResource
 from kivy import Logger
 
 
@@ -129,3 +129,4 @@ def for_plugin(plugin_name):
 
 just_file = ResourceManager.register_type('file', FileResource)
 image = ResourceManager.register_type('image', ImageResource)
+atlas = ResourceManager.register_type('atlas', AtlasResource)
