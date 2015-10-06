@@ -47,10 +47,12 @@ class ResourceManager(object):
 
     def register(self, resource_id, plugin, *args, **kwargs):
         if resource_id in self.registry[plugin]:
-            raise ProgrammingError("Resource id %(resource_id)s is already registered for module %(module)s" % {
-                "resource_id": resource_id,
-                "module": plugin
-            })
+            raise ProgrammingError("%(resource_name)s resource id \"%(resource_id)s\" "
+                                   "is already registered for plugin \"%(module)s\"" % {
+                                       "resource_name": self.resource_type.capitalize(),
+                                       "resource_id": resource_id,
+                                       "module": plugin
+                                   })
         self.registry[plugin][resource_id] = self.RESOURCE_TYPE_MAPPING[self.resource_type](
             plugin=plugin, *args, **kwargs
         )
