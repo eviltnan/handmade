@@ -5,3 +5,7 @@ class ImproperlyConfigured(Exception):
 
 class ProgrammingError(Exception):
     pass
+
+
+class ResourceError(Exception):
+    pass
