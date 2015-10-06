@@ -179,5 +179,7 @@ def test_atlas_resource_file_is_directory():
             atlas.test = 'test_atlas_not_directory.txt'
 
 
-def test_atlas_resource_file_not_empty():
-    raise NotImplementedError()
+def test_atlas_resource_directory_empty():
+    with pytest.raises(AtlasResource.DirectoryEmpty):
+        with for_plugin('test_plugin'):
+            atlas.test = 'empty_atlas'

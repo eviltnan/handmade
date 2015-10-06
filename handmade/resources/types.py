@@ -76,9 +76,16 @@ class AtlasResource(FileResource):
     class NotADirectory(ResourceError):
         pass
 
+    class DirectoryEmpty(ResourceError):
+        pass
+
     def __init__(self, filename, *args, **kwargs):
         super(AtlasResource, self).__init__(filename, *args, **kwargs)
 
         if not os.path.isdir(self.source_path):
             raise AtlasResource.NotADirectory("Atlas filename should be a directory, "
                                               "%s is not a directory" % self.source_path)
+
+        import glob
+        if not glob.glob1(self.source_path, "*.png"):
+            raise AtlasResource.DirectoryEmpty("Atlas directory %s does not contain png files" % self.source_path)
