@@ -104,20 +104,18 @@ class AtlasResource(FileResource):
             raise AtlasResource.NotADirectory("Atlas filename should be a directory, "
                                               "%s is not a directory" % self.source_path)
 
-        import glob
-        self.source_files = [os.path.join(self.source_path, filename)
-                             for filename in glob.glob1(self.source_path, "*.png")]
-
         if not self.source_files:
             raise AtlasResource.DirectoryEmpty("Atlas directory %s does not contain png files" % self.source_path)
 
     def __init__(self, filename, size=None, *args, **kwargs):
-        self.source_files = None
         super(AtlasResource, self).__init__(filename, *args, **kwargs)
         self.size = size or self.DEFAULT_SIZE
 
         self.atlas_filename = self.destination_path + ".atlas"
         self.atlas = None
+        import glob
+        self.source_files = [os.path.join(self.source_path, filename)
+                             for filename in glob.glob1(self.source_path, "*.png")]
 
 
 class KvResource(FileResource):
