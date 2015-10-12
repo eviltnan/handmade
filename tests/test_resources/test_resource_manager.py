@@ -82,7 +82,11 @@ def test_activate_registering_for_plugin_nested():
 
 
 def test_activate_registering_for_plugin_same_plugin():
-    raise NotImplementedError()
+    with pytest.raises(ResourceManager.SelfNestedResourceRegistration):
+        with for_plugin('dummy'):
+            with for_plugin('dummy'):
+                pass
+
 
 
 def test_attribute_register_not_in_context(resource_manager):
