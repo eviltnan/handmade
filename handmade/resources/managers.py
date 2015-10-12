@@ -73,13 +73,13 @@ class ResourceManager(object):
     def get(self, resource_id, plugin, *args, **kwargs):
 
         if plugin not in self.registry:
-            raise ResourceManager.ModuleNotRegistered("Module %s is not found in resource registry" % plugin)
+            raise ResourceManager.ModuleNotRegistered("Plugin %s is not found in resource registry" % plugin)
 
         if resource_id not in self.registry[plugin]:
             raise ResourceManager.IdNotRegistered(
-                "Resource %(resource_id)s is not found in %(module)s resource registry" % {
+                "Resource %(resource_id)s is not found in %(plugin)s resource registry" % {
                     "resource_id": resource_id,
-                    "module": plugin
+                    "plugin": plugin
                 })
 
         return self.registry[plugin][resource_id]

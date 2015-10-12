@@ -1,5 +1,6 @@
 import os
 from handmade.plugins import Plugin
+from handmade.resources.managers import image
 
 
 def test_discover_tasks():
@@ -8,4 +9,5 @@ def test_discover_tasks():
 
 
 def test_register_resources():
-    raise NotImplementedError()
+    from test_plugin import plugin
+    assert image['test_plugin'].logo == "data/test_plugin/data/image/test.png"
