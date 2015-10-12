@@ -87,13 +87,7 @@ class ResourceManager(object):
     @classmethod
     def enter_plugin_context(cls, plugin):
         if cls.current_plugin:
-
             cls._registration_stack.append(cls.current_plugin)
-            if plugin in cls._registration_stack:
-                raise ResourceManager.SelfNestedResourceRegistration(
-                    "You try to nest registering of resources of plugin "
-                    "%s while already registering the resources for this plugin" % plugin
-                )
 
         Logger.debug("Resources: enter in plugin context of %s" % plugin)
         cls.current_plugin = plugin
