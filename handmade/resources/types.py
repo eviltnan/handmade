@@ -120,3 +120,15 @@ class AtlasResource(FileResource):
 
         self.atlas_filename = self.destination_path + ".atlas"
         self.atlas = None
+
+
+class KvResource(FileResource):
+    class KvAlreadyLoaded(ResourceError):
+        pass
+
+    def __init__(self, filename, *args, **kwargs):
+        super(KvResource, self).__init__(filename, *args, **kwargs)
+        from kivy.lang import Builder
+        if self.destination_path not in Builder.files:
+            Builder.load_file(self.destination_path)
+        super(KvResource, self).get(*args, **kwargs)
