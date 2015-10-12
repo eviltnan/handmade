@@ -47,6 +47,10 @@ class Plugin(object):
         except ImportError:
             Logger.debug("Plugins: plugin %s does not declare resources, pass" % self.name)
 
+    def post_register_resources(self):
+        from handmade.resources.managers import kv
+        kv.post_register(self.name)
+
     def __init__(self, name):
         self.name = name
         self.tasks = None
@@ -54,6 +58,7 @@ class Plugin(object):
         self.discover_tasks()
         self.configure()
         self.register_resources()
+        self.post_register_resources()
 
 
 def discover():

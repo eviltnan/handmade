@@ -18,6 +18,9 @@ class BaseResource(object):
     def default_value(cls, value):
         raise NotImplementedError()
 
+    def post_register(self):
+        pass
+
     def __init__(self, plugin=None, *args, **kwargs):
         if not plugin:
             raise ProgrammingError("Plugin is not set while creating a resource. "
@@ -122,7 +125,7 @@ class KvResource(FileResource):
     class KvAlreadyLoaded(ResourceError):
         pass
 
-    def get(self, *args, **kwargs):
+    def post_register(self, *args, **kwargs):
         from kivy.lang import Builder
         if self.destination_path not in Builder.files:
             Builder.load_file(self.destination_path)

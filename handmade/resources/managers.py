@@ -41,6 +41,10 @@ class ResourceManager(object):
         cls.managers[type_key] = cls(type_key)
         return cls.managers[type_key]
 
+    def post_register(self, plugin):
+        for r in self.registry[plugin].values():
+            r.post_register()
+
     def __init__(self, resource_type):
 
         if resource_type not in ResourceManager.RESOURCE_TYPE_MAPPING:
