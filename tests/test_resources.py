@@ -177,7 +177,7 @@ def atlas_resource(request):
 def test_atlas_resource_file_is_directory():
     with pytest.raises(AtlasResource.NotADirectory):
         with for_plugin('test_plugin'):
-            atlas.test = 'test_atlas_not_directory.txt'
+            atlas.test = 'atlas_not_directory.txt'
 
 
 def test_atlas_resource_directory_empty():
