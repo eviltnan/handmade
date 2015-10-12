@@ -11,3 +11,8 @@ def test_discover_tasks():
 def test_register_resources():
     from test_plugin import plugin
     assert image['test_plugin'].logo == "data/test_plugin/data/image/test.png"
+
+
+def test_post_register_resources():
+    from test_plugin import plugin
+    raise NotImplementedError()
