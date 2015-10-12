@@ -23,8 +23,9 @@ class TestWidget(Widget):
     test_property = NumericProperty()
 
 
-def test_kv_resource_get(kv_resource):
-    kv_resource.get()
+def test_kv_resource_get_ok(kv_resource):
+    rules = kv_resource.get()
+    assert rules[0][0].key == 'notexistingwidget'
 
 
 def test_kv_resource_get_already_loaded(kv_resource):

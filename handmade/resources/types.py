@@ -23,7 +23,6 @@ class BaseResource(object):
             raise ProgrammingError("Plugin is not set while creating a resource. "
                                    "You should register resources with the manager")
         self.plugin = plugin
-        self.validate()
 
 
 class FileResource(BaseResource):
@@ -35,7 +34,7 @@ class FileResource(BaseResource):
         self.source_path = None
         self.destination_path = None
         super(FileResource, self).__init__(*args, **kwargs)
-        self.build_destination_path()
+        self.build_paths()
 
     def get(self, *args, **kwargs):
         return self.destination_path
@@ -46,7 +45,11 @@ class FileResource(BaseResource):
             "filename": value
         }
 
-    def build_destination_path(self):
+    def build_paths(self):
+
+        plugin_path = Plugin.get_plugin_path(self.plugin)
+        self.source_path = os.path.join(plugin_path, 'data', self.filename)
+
         chunks = [settings.RESOURCES_ROOT]
         chunks += self.plugin.split(".")
         chunks.append(self.filename)
@@ -60,14 +63,9 @@ class FileResource(BaseResource):
         shutil.copy(self.source_path, self.destination_path)
 
     def validate(self, *args, **kwargs):
-        plugin_path = Plugin.get_plugin_path(self.plugin)
-
-        full_path = os.path.join(plugin_path, 'data', self.filename)
-        if not os.path.exists(full_path):
+        if not os.path.exists(self.source_path):
             raise FileResource.FileNotFound("File %s not found. "
                                             "File name should be relative to plugin's data directory" % self.filename)
-        else:
-            self.source_path = full_path
 
 
 class ImageResource(FileResource):
@@ -126,9 +124,8 @@ class KvResource(FileResource):
     class KvAlreadyLoaded(ResourceError):
         pass
 
-    def __init__(self, filename, *args, **kwargs):
-        super(KvResource, self).__init__(filename, *args, **kwargs)
+    def get(self, *args, **kwargs):
         from kivy.lang import Builder
         if self.destination_path not in Builder.files:
             Builder.load_file(self.destination_path)
-        super(KvResource, self).get(*args, **kwargs)
+        return [rule for rule in Builder.rules if rule[1].ctx.filename == self.destination_path]
