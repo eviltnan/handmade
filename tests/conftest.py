@@ -18,5 +18,10 @@ def test_project(request):
         shutil.rmtree(settings.STORAGE_ROOT, ignore_errors=True)
         settings._wrapped = empty
         os.chdir(old_cwd)
+
+        from handmade.resources.managers import ResourceManager
+        ResourceManager.current_plugin = None
+        ResourceManager._registration_stack = []
+
     request.addfinalizer(fin)
     return settings

@@ -21,6 +21,8 @@ def test_file_resource_validate():
     with pytest.raises(FileResource.FileNotFound):
         with for_plugin('test_plugin'):
             just_file.test = 'not_found.png'
+            just_file.get('test', 'test_plugin').validate()
+    just_file.unregister('test', 'test_plugin')
 
 
 def test_file_resource_process(file_resource):

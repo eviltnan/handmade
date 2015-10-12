@@ -22,12 +22,16 @@ def test_atlas_resource_file_is_directory():
     with pytest.raises(AtlasResource.NotADirectory):
         with for_plugin('test_plugin'):
             atlas.test = 'atlas_not_directory.txt'
+            atlas.get('test', 'test_plugin').validate()
+    atlas.unregister('test', 'test_plugin')
 
 
 def test_atlas_resource_directory_empty():
     with pytest.raises(AtlasResource.DirectoryEmpty):
         with for_plugin('test_plugin'):
             atlas.test = 'empty_atlas'
+            atlas.get('test', 'test_plugin').validate()
+    atlas.unregister('test', 'test_plugin')
 
 
 def test_atlas_register_dict_notation():
