@@ -21,6 +21,7 @@ class ResourceManager(object):
     }
     managers = {}
     current_plugin = None
+    _registration_stack = []
 
     class ModuleNotRegistered(ProgrammingError):
         pass
@@ -82,13 +83,18 @@ class ResourceManager(object):
 
     @classmethod
     def enter_plugin_context(cls, plugin):
+        if cls.current_plugin:
+            cls._registration_stack.append(cls.current_plugin)
         Logger.debug("Resources: enter in plugin context of %s" % plugin)
         cls.current_plugin = plugin
 
     @classmethod
     def exit_plugin_context(cls):
         Logger.debug("Resources: exit plugin context")
-        cls.current_plugin = None
+        if cls._registration_stack:
+            cls.current_plugin = cls._registration_stack.pop()
+        else:
+            cls.current_plugin = None
 
     def __setattr__(self, key, value):
 

@@ -73,6 +73,18 @@ def test_activate_registering_for_plugin():
         ' of registering resources' % ResourceManager.current_plugin
 
 
+def test_activate_registering_for_plugin_nested():
+    with for_plugin('dummy'):
+        assert ResourceManager.current_plugin == 'dummy'
+        with for_plugin('dummy2'):
+            assert ResourceManager.current_plugin == 'dummy2'
+        assert ResourceManager.current_plugin == 'dummy', 'Failed to pop for plugin context'
+
+
+def test_activate_registering_for_plugin_same_plugin():
+    raise NotImplementedError()
+
+
 def test_attribute_register_not_in_context(resource_manager):
     with pytest.raises(ResourceManager.CurrentPluginNotSet):
         resource_manager.dummy = 'dummy.png'
