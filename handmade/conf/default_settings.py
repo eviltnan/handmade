@@ -2,7 +2,7 @@ DEBUG = False
 PLUGINS = [
     'handmade.core',
     'handmade.resources',
-    'handmade.themes'
+    'handmade.themes',
     'handmade.project',
 ]
 ROOT_WIDGET = 'kivy.uix.screenmanager.ScreenManager'
