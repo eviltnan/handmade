@@ -2,6 +2,11 @@ import shutil
 from _pytest.python import fixture
 from handmade.utils import empty
 
+@fixture
+def plugins_discovered():
+    from handmade.plugins import discover
+    discover()
+
 
 @fixture(autouse=True)
 def test_project(request):
