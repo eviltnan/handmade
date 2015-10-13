@@ -1,5 +1,6 @@
 import importlib
 import os
+import sys
 
 from handmade.exceptions import ImproperlyConfigured, ProgrammingError
 from kivy import Logger
@@ -62,6 +63,9 @@ class Plugin(object):
 
 
 def discover():
+    os.environ.setdefault("HANDMADE_SETTINGS_MODULE", "settings")
+    if sys.path[0] != os.getcwd():
+        sys.path = [os.getcwd()] + sys.path
     from conf import settings
 
     for plugin in settings.PLUGINS:
