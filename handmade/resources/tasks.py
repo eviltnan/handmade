@@ -23,3 +23,14 @@ def validate(c):
             for resource_id, resource in manager.registry[plugin].items():
                 print u" ╚%s:" % resource_id
                 resource.validate()
+
+
+@task
+def process(c):
+    for plugin in settings.PLUGINS:
+        print u"%s:" % plugin
+        for resource_type, manager in ResourceManager.managers.items():
+            print u"╚%s:" % resource_type
+            for resource_id, resource in manager.registry[plugin].items():
+                print u" ╚%s:" % resource_id
+                resource.validate()
