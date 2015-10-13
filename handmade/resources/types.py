@@ -67,8 +67,10 @@ class FileResource(BaseResource):
 
     def validate(self, *args, **kwargs):
         if not os.path.exists(self.source_path):
-            raise FileResource.FileNotFound("File %s not found. "
-                                            "File name should be relative to plugin's data directory" % self.filename)
+            raise FileResource.FileNotFound(
+                "File resource %s from plugin %s not found . "
+                "File name should be relative to plugin's data directory" % (self.filename, self.plugin)
+            )
 
 
 class ImageResource(FileResource):
