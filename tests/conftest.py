@@ -2,11 +2,6 @@ import shutil
 from _pytest.python import fixture
 from handmade.utils import empty
 
-@fixture
-def plugins_discovered():
-    from handmade.plugins import discover
-    discover()
-
 
 @fixture(autouse=True)
 def test_project(request):
@@ -16,7 +11,8 @@ def test_project(request):
     os.chdir(os.path.join('tests', 'test_project'))
 
     from handmade.conf import settings
-    settings.configure()
+    from handmade.plugins import discover
+    discover()
 
     def fin():
         shutil.rmtree(settings.RESOURCES_ROOT, ignore_errors=True)
